@@ -49,9 +49,9 @@ typedef struct
     volatile uint32_t RCC_PLLI2SCFGR;   //  MCAL_RCC PLLI2S configuration register
     const    uint32_t _reserved_14;     //  Reserved register space
     volatile uint32_t RCC_DCKCFGR;      //  MCAL_RCC Dedicated Clocks Configuration Register
-} RCC_RegDef;
+} MCAL_RCC_RegDef_t;
 
-#define MCAL_RCC                ((GPIO_RegDef_t* ) _MMIO_ADDR_RCC)
+#define MCAL_RCC                ((MCAL_RCC_RegDef_t* ) _MMIO_ADDR_RCC)
 
 #define MCAL_GPIOA_PCLK_EN()    (MCAL_RCC->RCC_AHB1ENR |= (1<<0))
 #define MCAL_GPIOA_PCLK_DI()    (MCAL_RCC->RCC_AHB1ENR &= ~(1<<0))
@@ -147,26 +147,26 @@ typedef struct
     volatile uint32_t LCKR;
     volatile uint32_t AFRL;
     volatile uint32_t AFRH;
-} GPIO_RegDef_t;
+} MCAL_GPIO_RegDef_t;
 
 
 #define _MMIO_ADDR_GPIOA    0x40020000U  
-#define MCAL_GPIOA          ((GPIO_RegDef_t* ) _MMIO_ADDR_GPIOA)
+#define MCAL_GPIOA          ((MCAL_GPIO_RegDef_t* ) _MMIO_ADDR_GPIOA)
 
 #define _MMIO_ADDR_GPIOB    0x40020400U
-#define MCAL_GPIOB          ((GPIO_RegDef_t* ) _MMIO_ADDR_GPIOB)
+#define MCAL_GPIOB          ((MCAL_GPIO_RegDef_t* ) _MMIO_ADDR_GPIOB)
 
 #define _MMIO_ADDR_GPIOC    0x40020800U
-#define MCAL_GPIOC          ((GPIO_RegDef_t* ) _MMIO_ADDR_GPIOC)
+#define MCAL_GPIOC          ((MCAL_GPIO_RegDef_t* ) _MMIO_ADDR_GPIOC)
 
 #define _MMIO_ADDR_GPIOD    0x40020C00U
-#define MCAL_GPIOD          ((GPIO_RegDef_t* ) _MMIO_ADDR_GPIOD)
+#define MCAL_GPIOD          ((MCAL_GPIO_RegDef_t* ) _MMIO_ADDR_GPIOD)
 
 #define _MMIO_ADDR_GPIOE    0x40021000U
-#define MCAL_GPIOE          ((GPIO_RegDef_t* ) _MMIO_ADDR_GPIOE)
+#define MCAL_GPIOE          ((MCAL_GPIO_RegDef_t* ) _MMIO_ADDR_GPIOE)
 
 #define _MMIO_ADDR_GPIOH    0x40021C00U
-#define MCAL_GPIOH          ((GPIO_RegDef_t* ) _MMIO_ADDR_GPIOH)
+#define MCAL_GPIOH          ((MCAL_GPIO_RegDef_t* ) _MMIO_ADDR_GPIOH)
 
 
 #define _MMIO_ADDR_EXTI     0x40013C00U

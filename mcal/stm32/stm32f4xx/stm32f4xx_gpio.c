@@ -9,13 +9,13 @@
  */
 
 #include <mcus.h>
-#if IS_MCU(STM32F411)
+#if IS_MCU(MCU_STM32F411)
 
-#include <datatypes.h>
-#include <gpio.h>
-#include <stm32f411.h>s
-#include <stm32f411_pins.h>
-#include <stm32f411_gpio.h>
+#include "../../../includes/datatypes.h"
+#include "../../../includes/gpio.h"
+#include "stm32f411.h"
+#include "stm32f4xx_pins.h"
+#include "stm32f4xx_gpio.h"
 
 boolean pin_exists(MCAL_GPIO_pin_t pin);
 
@@ -48,7 +48,7 @@ std_return_type_t MCAL_GPIO_init(MCAL_GPIO_pin_t port)
     return E_OK;
 }
 
-std_return_type_t MCAL_GPIO_deinit(GPIO_pin_t port)
+std_return_type_t MCAL_GPIO_deinit(MCAL_GPIO_pin_t port)
 {
     switch (port)
     {
@@ -77,7 +77,7 @@ std_return_type_t MCAL_GPIO_deinit(GPIO_pin_t port)
     return E_OK;
 }
 
-std_return_type_t MCAL_GPIO_config_pin(GPIO_pin_t pin, GPIO_pin_mode_t mode)
+std_return_type_t MCAL_GPIO_config_pin(MCAL_GPIO_pin_t pin, MCAL_GPIO_pin_mode_t mode)
 {
     uint8_t temp;
     if(FALSE == pin_exists( pin))
@@ -112,7 +112,7 @@ std_return_type_t MCAL_GPIO_config_pin(GPIO_pin_t pin, GPIO_pin_mode_t mode)
         break;
     }
 
-    temp = (uint8_t) MCAL_GPIO_get_pin_numer(pin);;
+    temp = (uint8_t) MCAL_GPIO_get_pin_numer(pin);
 
     switch (mode)
     {
@@ -185,73 +185,215 @@ std_return_type_t MCAL_GPIO_config_pin(GPIO_pin_t pin, GPIO_pin_mode_t mode)
     return E_OK;
 }
 
-std_return_type_t MCAL_GPIO_pin_set(GPIO_pin_t pin)
-{
-    if(FALSE == pin_exists( pin))
-    {
-        return E_NOT_SUPPORTED;
-    }
-    return E_NOT_IMPLEMENTED;
-}
-
-std_return_type_t MCAL_GPIO_pin_clear(GPIO_pin_t pin)
+std_return_type_t MCAL_GPIO_pin_set(MCAL_GPIO_pin_t pin)
 {
     if(FALSE == pin_exists( pin))
     {
         return E_NOT_SUPPORTED;
     }
 
-    return E_NOT_IMPLEMENTED;
+    MCAL_GPIO_RegDef_t *port;
+    uint8_t shift = (uint8_t) MCAL_GPIO_get_pin_numer(pin);
+
+    switch (pin)
+    {
+    case PORT_A:
+        port = MCAL_GPIOA;
+        break;
+    case PORT_B:
+        port = MCAL_GPIOB;
+        break;
+    case PORT_C:
+        port = MCAL_GPIOC;
+        break;
+    case PORT_D:
+        port = MCAL_GPIOD;
+        break;
+    case PORT_E:
+        port = MCAL_GPIOE;
+        break;
+    case PORT_H:
+        port = MCAL_GPIOH;
+        break;
+    default:
+        return E_NOT_SUPPORTED;
+        break;
+    }
+
+    port->ODR |= (1 << shift);
+
+    return E_OK;
 }
 
-std_return_type_t MCAL_GPIO_port_set(GPIO_pin_t pin, uint16_t value)
+std_return_type_t MCAL_GPIO_pin_clear(MCAL_GPIO_pin_t pin)
+{
+    if(FALSE == pin_exists( pin))
+    {
+        return E_NOT_SUPPORTED;
+    }
+
+    MCAL_GPIO_RegDef_t *port;
+    uint8_t shift = (uint8_t) MCAL_GPIO_get_pin_numer(pin);
+
+    switch (pin)
+    {
+    case PORT_A:
+        port = MCAL_GPIOA;
+        break;
+    case PORT_B:
+        port = MCAL_GPIOB;
+        break;
+    case PORT_C:
+        port = MCAL_GPIOC;
+        break;
+    case PORT_D:
+        port = MCAL_GPIOD;
+        break;
+    case PORT_E:
+        port = MCAL_GPIOE;
+        break;
+    case PORT_H:
+        port = MCAL_GPIOH;
+        break;
+    default:
+        return E_NOT_SUPPORTED;
+        break;
+    }
+
+    port->ODR &= ~(1 << shift);
+
+    return E_OK;
+}
+
+std_return_type_t MCAL_GPIO_port_set(MCAL_GPIO_pin_t pin, uint16_t value)
 {
     if(FALSE == pin_exists( pin))
     {
         return E_NOT_SUPPORTED;
     }
     
-    return E_NOT_IMPLEMENTED;
-}
+    MCAL_GPIO_RegDef_t *port;
 
-std_return_type_t MCAL_GPIO_pin_set_analog(GPIO_pin_t pin, uint16_t value)
-{
-    if(FALSE == pin_exists( pin))
+    switch (pin)
     {
+    case PORT_A:
+        port = MCAL_GPIOA;
+        break;
+    case PORT_B:
+        port = MCAL_GPIOB;
+        break;
+    case PORT_C:
+        port = MCAL_GPIOC;
+        break;
+    case PORT_D:
+        port = MCAL_GPIOD;
+        break;
+    case PORT_E:
+        port = MCAL_GPIOE;
+        break;
+    case PORT_H:
+        port = MCAL_GPIOH;
+        break;
+    default:
         return E_NOT_SUPPORTED;
+        break;
     }
+
+    port->ODR |= value;
+    port->ODR &= (((uint32_t)0xFFFF) << 16 )| value;
     
+
     return E_NOT_IMPLEMENTED;
 }
 
-std_return_type_t MCAL_GPIO_pin_iset_analog(GPIO_pin_t pin, uint16_t value)
+std_return_type_t MCAL_GPIO_pin_set_analog(MCAL_GPIO_pin_t pin, uint16_t value)
 {
-    if(FALSE == pin_exists( pin))
-    {
-        return E_NOT_SUPPORTED;
-    }
-    
-    return E_NOT_IMPLEMENTED;
+    return E_NOT_SUPPORTED;
 }
 
-boolean MCAL_GPIO_pin_read(GPIO_pin_t pin)
+std_return_type_t MCAL_GPIO_pin_iset_analog(MCAL_GPIO_pin_t pin, uint16_t value)
+{    
+    return E_NOT_SUPPORTED;
+}
+
+boolean MCAL_GPIO_pin_read(MCAL_GPIO_pin_t pin)
 {
     if(FALSE == pin_exists( pin))
     {
         return FALSE;
     }
 
+    MCAL_GPIO_RegDef_t *port;
+    uint8_t shift = (uint8_t) MCAL_GPIO_get_pin_numer(pin);
+
+    switch (pin)
+    {
+    case PORT_A:
+        port = MCAL_GPIOA;
+        break;
+    case PORT_B:
+        port = MCAL_GPIOB;
+        break;
+    case PORT_C:
+        port = MCAL_GPIOC;
+        break;
+    case PORT_D:
+        port = MCAL_GPIOD;
+        break;
+    case PORT_E:
+        port = MCAL_GPIOE;
+        break;
+    case PORT_H:
+        port = MCAL_GPIOH;
+        break;
+    default:
+        return FALSE;
+        break;
+    }
+
+    if(port->IDR & (1 << shift))
+    {
+        return TRUE;
+    }
+        
     return FALSE;
 }
 
-std_return_type_t MCAL_GPIO_port_read(GPIO_pin_t pin, uint16_t* buffer)
+std_return_type_t MCAL_GPIO_port_read(MCAL_GPIO_pin_t pin, uint16_t* buffer)
 {
     if(FALSE == pin_exists( pin))
     {
         return E_NOT_SUPPORTED;
     }
+
+    MCAL_GPIO_RegDef_t *port;
     
-    return E_NOT_IMPLEMENTED;
+    switch (pin)
+    {
+    case PORT_A:
+        port = MCAL_GPIOA;
+        break;
+    case PORT_B:
+        port = MCAL_GPIOB;
+        break;
+    case PORT_C:
+        port = MCAL_GPIOC;
+        break;
+    case PORT_D:
+        port = MCAL_GPIOD;
+        break;
+    case PORT_E:
+        port = MCAL_GPIOE;
+        break;
+    case PORT_H:
+        port = MCAL_GPIOH;
+        break;
+    default:
+        return FALSE;
+        break;
+    }
+    
+    return port->IDR & 0xFFFF;
 }
 
 boolean pin_exists(MCAL_GPIO_pin_t pin)

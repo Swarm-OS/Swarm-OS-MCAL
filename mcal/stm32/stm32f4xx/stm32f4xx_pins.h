@@ -1,5 +1,5 @@
-#ifndef MCAL_PINS_H
-#define MCAL_PINS_H
+#ifndef MCAL_STM32F4XX_PINS_H
+#define MCAL_STM32F4XX_PINS_H
 
 // define a pin
 // format : #define PIN_<Port>_Portnumber 0x<Port No [15:8]><Pin No[7:0]> 
@@ -11,7 +11,7 @@
 
 #include <gpio.h>
 
-#define __pin_t      (GPIO_pin_t)
+#define __pin_t      (MCAL_GPIO_pin_t)
 
 #define PIN_A_00    (__pin_t 0x0000)
 #define PIN_A_01    (__pin_t 0x0001)
