@@ -11,10 +11,4 @@
  */
 #include <mcus.h>
 
-#if IS_MCU(STM32F411XX)
-    #include <stm32f411xx_pins.h>
-#elif IS_MCU(ATMEGA328)
-    #include <atmeg328_pins.h>
-#endif
-
 #endif

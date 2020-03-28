@@ -8,14 +8,41 @@
  * @brief File containing all microcontroller definitions
  *
  * This file containing all microcontroller definitions
+ * 8 Bit MCU Venodr/Major type e.g. STM32, STM8, Atmel 
  */
 
-// Atmel Atmega Base 0x0001 0000
-#define ATMEGA328       0x00010001  
+// Atmel Base                   0x0100 0000
+#define MCU_ATMEL               0x01000000
 
-// STMicro STM32 Base 0x0002 0000
-#define STM32F411       0x00020001
+// Atmel Atmegea                0x0101 0000
+#define MCU_ATMEL_ATMEGA        0x01010000  
+#define MCU_ATMEL_ATMEGA328     0x01010001  
 
-#define IS_MCU(MCU)            defined MCU && (CURRENT_MCU==MCU)
+
+// STMicro STM32 Base           0x0200 0000
+#define MCU_STM32               0x02000000
+
+// STMicro STM32F4 family       0x0204 0000
+#define MCU_STM32F4             0x02040000
+#define MCU_STM32F411           0x0204000B
+
+#define MCU_FAMILY(MCU)         (MCU & 0xFFFF0000)
+#define MCU_VENDOR(MCU)         (MCU & 0xFF000000)
+
+#define IS_MCU(MCU)             ( CURRENT_MCU==MCU )
+#define IS_MCU_FAMILY(MCU)      ( MCU_FAMILY(CURRENT_MCU) == MCU_FAMILY(MCU))
+#define IS_MCU_VENDOR(MCU)      ( MCU_VENDOR(CURRENT_MCU) == MCU_VENDOR(MCU))
+
+#ifndef CURRENT_MCU
+#   if defined(ATMEGA328)
+#       define CURRENT_MCU MCU_ATMEL_ATMEGA328
+#   elif defined(STM32F411)
+#       define CURRENT_MCU MCU_STM32F411
+#   endif
+#endif
+
+#if IS_MCU_VENDOR(MCU_STM32)
+    #include "stm32/stm32.h"
+#endif
 
 #endif
