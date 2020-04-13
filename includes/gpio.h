@@ -16,9 +16,10 @@
 #include <stdint.h>
 #include <datatypes.h>
 
-#define MCAL_GPIO_get_port(id) ((id & 0xFF00) > 8)
-#define MCAL_GPIO_get_pin_numer(id) (id & 0xFF)
-#define MCAL_GPIO_is_port(id) ((id & 0xFF) == 0xFF ? TRUE : FALSE)
+#define MCAL_GPIO_get_port(id) (id | 0x00FF)
+#define MCAL_GPIO_get_port_number(id) ((id >> 8) & 0xFF)
+#define MCAL_GPIO_get_pin_number(id) (id & 0x00FF)
+#define MCAL_GPIO_is_port(id) ((id & 0x00FF) == 0x00FF ? TRUE : FALSE)
 
 /**
  * @brief Pin identifier
@@ -37,21 +38,30 @@ typedef uint16_t MCAL_GPIO_pin_t;
  * GPIO_OUTPUT         : use pin as digital output
  * GPIO_OUTPUT_ANALOG  : use pin as analog output
  */
-typedef enum MCAL_GPIO_pin_mode { 
-    GPIO_INPUT          = 0x00,
-    GPIO_INPUT_PULLUP   = 0x01,
-    GPIO_INPUT_PULDOWN  = 0x02,
-    GPIO_INPUT_ANALOG   = 0x03,
-    GPIO_INPUT_FLOATING = 0x04,
-    GPIO_INPUT_ITR      = 0x05,
-    GPIO_INPUT_ITR_RISE = 0x06,
-    GPIO_INPUT_ITR_FALL = 0x07,
-    GPIO_OUTPUT         = 0x10,
-    GPIO_OUTPUT_PULLUP  = 0x11,
-    GPIO_OUTPUT_PULLDOWN= 0x12,
-    GPIO_OUTPUT_ANALOG  = 0x13,
-    GPIO_OUTPUT_OPEN_DRAIN = 0x14,
+typedef enum _MCAL_GPIO_pin_mode { 
+    MCAL_GPIO_INPUT          = 0x00,
+    MCAL_GPIO_INPUT_ANALOG   = 0x01,
+    MCAL_GPIO_OUTPUT         = 0x10,
+    MCAL_GPIO_OUTPUT_ANALOG  = 0x11,
+    MCAL_GPIO_INPUT_ITR_BOTH=5,
+    MCAL_GPIO_INPUT_ITR_RISE=6,
+    MCAL_GPIO_INPUT_ITR_FALL=7,
 } MCAL_GPIO_pin_mode_t;
+
+typedef enum _MCAL_GPIO_pullup_mode{
+    MCAL_GPIO_NO_PULLUP     = 0x00,
+    MCAL_GPIO_PULLUP        = 0x01,
+    MCAL_GPIO_PULLDOWN      = 0x02,
+} MCAL_GPIO_pullup_mode_t;
+
+typedef enum
+{
+    MCAL_GPIO_NO_TRIGGER    = 0x00,
+    MCAL_GPIO_FALLING_EDGE  = 0x01,
+    MCAL_GPIO_RISING_EDGE   = 0x02,
+    MCAL_GPIO_BOTH_EDGES    = 0x03,
+    
+} MCAL_GPIO_trigger_t;
 
 /**
  * @brief Initialize GPIO Port
@@ -93,7 +103,9 @@ std_return_type_t MCAL_GPIO_deinit(MCAL_GPIO_pin_t port);
  *                                    the function returns E_NOT_IMPLEMENTED.
  *                                    Else it returns E_OK.
  */
-std_return_type_t MCAL_GPIO_config_pin(MCAL_GPIO_pin_t pin, MCAL_GPIO_pin_mode_t mode);
+std_return_type_t MCAL_GPIO_config_pin(MCAL_GPIO_pin_t pin, 
+                                       MCAL_GPIO_pin_mode_t mode, 
+                                       MCAL_GPIO_pullup_mode_t pullup);
 
 /**
  * @brief Set GPIO pin
@@ -187,5 +199,25 @@ boolean MCAL_GPIO_pin_read(MCAL_GPIO_pin_t pin);
  * @return boolean status           : Pin values of the whole port. 
  */
 std_return_type_t MCAL_GPIO_port_read(MCAL_GPIO_pin_t pin, uint16_t* buffer);
+
+/**
+ * @brief Sets trigger options of a specific pin
+ *  
+ * This function sets interrupts according to the given trigger condition.
+ * Please check your processor manual which pins support triggering interrupts
+ * on edge changes. 
+ * 
+ * @param  MCAL_GPIO_pin_t pin      : Which pin shall be configured
+ * @param  MCAL_GPIO_trigger_t trigger: Trigger condition
+ * @param  void (*callback)(void)   : callback function which shall be called
+ *                                    after the trigger was acitvated. If 
+ *                                    MCAL_GPIO_NO_TRIGGER is used for tigger
+ *                                    condition, the callback argument will be
+ *                                    ignored. 
+ * @return std_return_type_t status : If the pin does not exist or does not
+ *                                    support edge detection, E_NOT_SUPPORTED
+ *                                    will be returned. 
+ */
+std_return_type_t MCAL_GPIO_input_trigger(MCAL_GPIO_pin_t pin, MCAL_GPIO_trigger_t trigger, void (*callback)(void));
 
 #endif
