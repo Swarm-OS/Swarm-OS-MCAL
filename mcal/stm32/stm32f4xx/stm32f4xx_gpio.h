@@ -1,4 +1,0 @@
-#ifndef MCAL_GPIO_STM32F411XX_H
-#define MCAL_GPIO_STM32F411XX_H
-
-#endif
