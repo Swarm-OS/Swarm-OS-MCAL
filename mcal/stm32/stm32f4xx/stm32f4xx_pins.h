@@ -11,7 +11,7 @@
 
 #include <gpio.h>
 
-#define __pin_t      (MCAL_GPIO_pin_t)
+#define __pin_t      (GPIOIf_pin_t)
 
 #define PIN_A_00    (__pin_t 0x0000)
 #define PIN_A_01    (__pin_t 0x0001)

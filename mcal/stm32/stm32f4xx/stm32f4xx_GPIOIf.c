@@ -23,13 +23,13 @@
 static void (*EXTI_cbs[16]) (void) = {};
 static uint16_t EXTI_mask = 0; 
 
-boolean pin_exists(MCAL_GPIO_pin_t pin);
-void set_interrupt_register(MCAL_GPIO_pin_t pin);
-void clear_interrupt_register(MCAL_GPIO_pin_t pin);
+boolean pin_exists(GPIOIf_pin_t pin);
+void set_interrupt_register(GPIOIf_pin_t pin);
+void clear_interrupt_register(GPIOIf_pin_t pin);
 
-std_return_type_t MCAL_GPIO_init(MCAL_GPIO_pin_t port)
+std_return_type_t GPIOIf_init(GPIOIf_pin_t port)
 {
-    switch (MCAL_GPIO_get_port(port))
+    switch (GPIOIf_get_port(port))
     {
     case PORT_A:
         MCAL_GPIOA_PCLK_EN();
@@ -50,16 +50,16 @@ std_return_type_t MCAL_GPIO_init(MCAL_GPIO_pin_t port)
         MCAL_GPIOH_PCLK_EN();
         break;
     default:
-        return E_NOT_SUPPORTED;
+        return E_NOT_EXISTING;
         break;
     }
     return E_OK;
     
 }
 
-std_return_type_t MCAL_GPIO_deinit(MCAL_GPIO_pin_t port)
+std_return_type_t GPIOIf_deinit(GPIOIf_pin_t port)
 {
-    switch (MCAL_GPIO_get_port(port))
+    switch (GPIOIf_get_port(port))
     {
     case PORT_A:
         MCAL_GPIOA_PCLK_DI();
@@ -80,24 +80,24 @@ std_return_type_t MCAL_GPIO_deinit(MCAL_GPIO_pin_t port)
         MCAL_GPIOH_PCLK_DI();
         break;
     default:
-        return E_NOT_SUPPORTED;
+        return E_NOT_EXISTING;
         break;
     }
     return E_OK;
 }
 
-std_return_type_t MCAL_GPIO_config_pin(MCAL_GPIO_pin_t pin, MCAL_GPIO_pin_mode_t mode, MCAL_GPIO_pullup_mode_t pullup)
+std_return_type_t GPIOIf_config_pin(GPIOIf_pin_t pin, GPIOIf_pin_mode_t mode, GPIOIf_pullup_mode_t pullup)
 {
     if(FALSE == pin_exists( pin))
     {
-        return E_NOT_SUPPORTED;
+        return E_NOT_EXISTING;
     }
 
     MCAL_GPIO_RegDef_t *port;
     
-    uint8_t pin_number = (uint8_t) MCAL_GPIO_get_pin_number(pin);
+    uint8_t pin_number = (uint8_t) GPIOIf_get_pin_number(pin);
     
-    switch (MCAL_GPIO_get_port(pin))
+    switch (GPIOIf_get_port(pin))
     {
     case PORT_A:
         port = MCAL_GPIOA;
@@ -124,22 +124,22 @@ std_return_type_t MCAL_GPIO_config_pin(MCAL_GPIO_pin_t pin, MCAL_GPIO_pin_mode_t
 
     switch (mode)
     {
-    case MCAL_GPIO_INPUT:
+    case GPIOIf_INPUT:
         // set pin mode
         port->MODER &= ~(0x3 << (pin_number <<1));
         break;
-    case MCAL_GPIO_INPUT_ANALOG   :
+    case GPIOIf_INPUT_ANALOG   :
         // set pin mode
         port->MODER |= (0x3 << (pin_number <<1));
         break;
-    case MCAL_GPIO_OUTPUT         :
+    case GPIOIf_OUTPUT         :
         // set pin mode
         port->MODER &= ~(0x2 << (pin_number <<1));
         port->MODER |=  (0x1 << (pin_number <<1));
         // output driver configuration - push-pull
         port->OTYPER &= ~(0x1 << (pin_number));
         break;
-    case MCAL_GPIO_OUTPUT_ANALOG  :
+    case GPIOIf_OUTPUT_ANALOG  :
     default:
         return E_NOT_SUPPORTED;
         break;
@@ -147,16 +147,16 @@ std_return_type_t MCAL_GPIO_config_pin(MCAL_GPIO_pin_t pin, MCAL_GPIO_pin_mode_t
 
     switch (pullup)
     {
-    case MCAL_GPIO_NO_PULLUP:
+    case GPIOIf_NO_PULLUP:
         // disable pullups/pulldowns
         port->PUPDR &= ~(0x3 << (pin_number <<1));
         break;
-    case MCAL_GPIO_PULLUP   :
+    case GPIOIf_PULLUP   :
         // set pullups
         port->PUPDR &= ~(0x2 << (pin_number <<1));
         port->PUPDR |=  (0x1 << (pin_number <<1));
         break;
-    case MCAL_GPIO_PULLDOWN  :
+    case GPIOIf_PULLDOWN  :
         // set pulldowns
         port->PUPDR &= ~(0x1 << (pin_number <<1));
         port->PUPDR |=  (0x2 << (pin_number <<1));
@@ -170,17 +170,17 @@ std_return_type_t MCAL_GPIO_config_pin(MCAL_GPIO_pin_t pin, MCAL_GPIO_pin_mode_t
     return E_OK;
 }
 
-std_return_type_t MCAL_GPIO_pin_set(MCAL_GPIO_pin_t pin)
+std_return_type_t GPIOIf_pin_set(GPIOIf_pin_t pin)
 {
     if(FALSE == pin_exists( pin))
     {
-        return E_NOT_SUPPORTED;
+        return E_NOT_EXISTING;
     }
 
     MCAL_GPIO_RegDef_t *port;
-    uint8_t pin_number = (uint8_t) MCAL_GPIO_get_pin_number(pin);
+    uint8_t pin_number = (uint8_t) GPIOIf_get_pin_number(pin);
     
-    switch (MCAL_GPIO_get_port(pin))
+    switch (GPIOIf_get_port(pin))
     {
     case PORT_A:
         port = MCAL_GPIOA;
@@ -209,17 +209,17 @@ std_return_type_t MCAL_GPIO_pin_set(MCAL_GPIO_pin_t pin)
     return E_OK;
 }
 
-std_return_type_t MCAL_GPIO_pin_clear(MCAL_GPIO_pin_t pin)
+std_return_type_t GPIOIf_pin_clear(GPIOIf_pin_t pin)
 {
     if(FALSE == pin_exists( pin))
     {
-        return E_NOT_SUPPORTED;
+        return E_NOT_EXISTING;
     }
 
     MCAL_GPIO_RegDef_t *port;
-    uint8_t pin_number = (uint8_t) MCAL_GPIO_get_pin_number(pin)+ 16;
+    uint8_t pin_number = (uint8_t) GPIOIf_get_pin_number(pin)+ 16;
 
-    switch (MCAL_GPIO_get_port(pin))
+    switch (GPIOIf_get_port(pin))
     {
     case PORT_A:
         port = MCAL_GPIOA;
@@ -248,16 +248,16 @@ std_return_type_t MCAL_GPIO_pin_clear(MCAL_GPIO_pin_t pin)
     return E_OK;
 }
 
-std_return_type_t MCAL_GPIO_port_set(MCAL_GPIO_pin_t pin, uint16_t value)
+std_return_type_t GPIOIf_port_set(GPIOIf_pin_t pin, uint16_t value)
 {
     if(FALSE == pin_exists( pin))
     {
-        return E_NOT_SUPPORTED;
+        return E_NOT_EXISTING;
     }
     
     MCAL_GPIO_RegDef_t *port;
 
-    switch (MCAL_GPIO_get_port(pin))
+    switch (GPIOIf_get_port(pin))
     {
     case PORT_A:
         port = MCAL_GPIOA;
@@ -289,17 +289,17 @@ std_return_type_t MCAL_GPIO_port_set(MCAL_GPIO_pin_t pin, uint16_t value)
     return E_NOT_IMPLEMENTED;
 }
 
-std_return_type_t MCAL_GPIO_pin_set_analog(MCAL_GPIO_pin_t pin, uint16_t value)
+std_return_type_t GPIOIf_pin_set_analog(GPIOIf_pin_t pin, uint16_t value)
 {
     return E_NOT_SUPPORTED;
 }
 
-std_return_type_t MCAL_GPIO_pin_iset_analog(MCAL_GPIO_pin_t pin, uint16_t value)
+std_return_type_t GPIOIf_pin_iset_analog(GPIOIf_pin_t pin, uint16_t value)
 {    
     return E_NOT_SUPPORTED;
 }
 
-boolean MCAL_GPIO_pin_read(MCAL_GPIO_pin_t pin)
+boolean GPIOIf_pin_read(GPIOIf_pin_t pin)
 {
     if(FALSE == pin_exists( pin))
     {
@@ -307,9 +307,9 @@ boolean MCAL_GPIO_pin_read(MCAL_GPIO_pin_t pin)
     }
 
     MCAL_GPIO_RegDef_t *port;
-    uint8_t pin_number = (uint8_t) MCAL_GPIO_get_pin_number(pin);
+    uint8_t pin_number = (uint8_t) GPIOIf_get_pin_number(pin);
 
-    switch (MCAL_GPIO_get_port(pin))
+    switch (GPIOIf_get_port(pin))
     {
     case PORT_A:
         port = MCAL_GPIOA;
@@ -342,16 +342,16 @@ boolean MCAL_GPIO_pin_read(MCAL_GPIO_pin_t pin)
     return FALSE;
 }
 
-std_return_type_t MCAL_GPIO_port_read(MCAL_GPIO_pin_t pin, uint16_t* buffer)
+std_return_type_t GPIOIf_port_read(GPIOIf_pin_t pin, uint16_t* buffer)
 {
     if(FALSE == pin_exists( pin))
     {
-        return E_NOT_SUPPORTED;
+        return E_NOT_EXISTING;
     }
 
     MCAL_GPIO_RegDef_t *port;
     
-    switch (MCAL_GPIO_get_port(pin))
+    switch (GPIOIf_get_port(pin))
     {
     case PORT_A:
         port = MCAL_GPIOA;
@@ -379,39 +379,44 @@ std_return_type_t MCAL_GPIO_port_read(MCAL_GPIO_pin_t pin, uint16_t* buffer)
     return E_OK;
 }
 
-std_return_type_t MCAL_GPIO_input_trigger(MCAL_GPIO_pin_t pin, MCAL_GPIO_trigger_t trigger, void (*callback)(void))
+std_return_type_t GPIOIf_input_trigger(GPIOIf_pin_t pin, GPIOIf_trigger_t trigger, void (*callback)(void))
 {
     if(FALSE == pin_exists( pin))
     {
-        return E_NOT_SUPPORTED;
+        return E_NOT_EXISTING;
     }
     
-    uint8_t pin_number = (uint8_t) MCAL_GPIO_get_pin_number(pin);
+    uint8_t pin_number = (uint8_t) GPIOIf_get_pin_number(pin);
     
+    if(pin_number > 4)
+    {
+        return E_NOT_IMPLEMENTED;
+    } 
+
     switch (trigger)
     {
-        case MCAL_GPIO_NO_TRIGGER:
+        case GPIOIf_NO_TRIGGER:
             // clear rising trigger flag
             MCAL_EXTI->EXTI_RTSR    &= ~(0x1 << pin_number);
             // clear falling trigger flag
             MCAL_EXTI->EXTI_FTSR    &= ~(0x1 << pin_number);
 
             break;
-        case MCAL_GPIO_BOTH_EDGES :
+        case GPIOIf_BOTH_EDGES :
             // set rising trigger flag
             MCAL_EXTI->EXTI_RTSR    |= (0x1 << pin_number);
             // set falling trigger flag
             MCAL_EXTI->EXTI_FTSR    |= (0x1 << pin_number);
             
             break;
-        case MCAL_GPIO_RISING_EDGE :
+        case GPIOIf_RISING_EDGE :
             // set rising trigger flag
             MCAL_EXTI->EXTI_RTSR    |= (0x1 << pin_number);
             // clear falling trigger flag
             MCAL_EXTI->EXTI_FTSR    &= ~(0x1 << pin_number);
 
             break;
-        case MCAL_GPIO_FALLING_EDGE :
+        case GPIOIf_FALLING_EDGE :
             // clear rising trigger flag
             MCAL_EXTI->EXTI_RTSR    &= ~(0x1 << pin_number);
             // set falling trigger flag
@@ -423,7 +428,7 @@ std_return_type_t MCAL_GPIO_input_trigger(MCAL_GPIO_pin_t pin, MCAL_GPIO_trigger
             break;
     }
 
-    if(trigger == MCAL_GPIO_NO_TRIGGER)
+    if(trigger == GPIOIf_NO_TRIGGER)
     {
         EXTI_mask &= ~(1 << pin_number);
         EXTI_cbs[pin_number] = 0UL;
@@ -439,9 +444,9 @@ std_return_type_t MCAL_GPIO_input_trigger(MCAL_GPIO_pin_t pin, MCAL_GPIO_trigger
     return E_OK;
 }
 
-boolean pin_exists(MCAL_GPIO_pin_t pin)
+boolean pin_exists(GPIOIf_pin_t pin)
 {
-    MCAL_GPIO_pin_t pin_port = MCAL_GPIO_get_port(pin);
+    GPIOIf_pin_t pin_port = GPIOIf_get_port(pin);
 
     switch (pin_port)
     {
@@ -457,7 +462,7 @@ boolean pin_exists(MCAL_GPIO_pin_t pin)
         break;
     }
 
-    pin_port = MCAL_GPIO_get_pin_number(pin);
+    pin_port = GPIOIf_get_pin_number(pin);
 
     if(pin_port > 0xF)
     {
@@ -468,11 +473,11 @@ boolean pin_exists(MCAL_GPIO_pin_t pin)
 }
 
 
-void set_interrupt_register(MCAL_GPIO_pin_t pin)
+void set_interrupt_register(GPIOIf_pin_t pin)
 {
-    uint8_t pin_number = (uint8_t) MCAL_GPIO_get_pin_number(pin);
+    uint8_t pin_number = (uint8_t) GPIOIf_get_pin_number(pin);
     uint8_t shift = (pin_number & 0x3) << 2;
-    uint8_t port_number = (uint8_t) MCAL_GPIO_get_port_number(pin);
+    uint8_t port_number = (uint8_t) GPIOIf_get_port_number(pin);
     
     uint32_t temp = 0x0F ^ port_number;  
     temp = ! (temp << shift);
@@ -539,9 +544,9 @@ void set_interrupt_register(MCAL_GPIO_pin_t pin)
     } 
 }   
 
-void clear_interrupt_register(MCAL_GPIO_pin_t pin)
+void clear_interrupt_register(GPIOIf_pin_t pin)
 {
-    uint8_t pin_number = (uint8_t) MCAL_GPIO_get_pin_number(pin);
+    uint8_t pin_number = (uint8_t) GPIOIf_get_pin_number(pin);
     
     MCAL_EXTI->EXTI_IMR &= ~(0x01 << pin_number);
 
