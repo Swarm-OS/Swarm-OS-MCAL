@@ -41,8 +41,4 @@
 #   endif
 #endif
 
-#if IS_MCU_VENDOR(MCU_STM32)
-    #include "stm32/stm32.h"
-#endif
-
 #endif
