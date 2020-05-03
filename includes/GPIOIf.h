@@ -1,5 +1,5 @@
 /**
- * @file gpio.h
+ * @file GPIOPIf.h
  * @author Christoph Lehr
  * @date 4 Aug 2019
  * @brief File containing API for accessing GPIO's
@@ -10,8 +10,8 @@
  * check ADC.h. 
  */
 
-#ifndef GPIOIf_H
-#define GPIOIf_H
+#ifndef GPIOIF_H
+#define GPIOIF_H
 
 #include <stdint.h>
 #include <datatypes.h>
