@@ -1,5 +1,5 @@
-#ifndef MCAL_STM32F411XX_H
-#define MCAL_STM32F411XX_H
+#ifndef STM32F4xx_STM32F411XX_H
+#define STM32F4xx_STM32F411XX_H
 
 #include <stdint.h>
 
@@ -26,9 +26,9 @@ typedef struct
     volatile uint32_t NVIC_IPR0[60];    //  0x0300 - 0x03EC Interrupt Priority Registers 0xE000E400
     const uint32_t reserved_6[644];     //  0x03F0 - 0x0DFC reserved 
     volatile uint32_t STIR;             //  0x0E00 Software Trigger Interrupt Register 0xE000EF00
-} MCAL_NVIC_RegDef_t;
+} STM32F4xx_NVIC_RegDef_t;
 
-#define MCAL_NVIC           ((MCAL_NVIC_RegDef_t* ) _MMIO_ADDR_NVIC)
+#define STM32F4xx_NVIC           ((STM32F4xx_NVIC_RegDef_t* ) _MMIO_ADDR_NVIC)
 
 
 // STM32F4xx peripheral registers
@@ -40,135 +40,135 @@ typedef struct
 {
     volatile uint32_t PWR_CR;           //  0x00 PWR power control register 
     volatile uint32_t PWR_CSR;          //  0x04 PWR power control/status register
-} MCAL_PWR_RegDef_t;
+} STM32F4xx_PWR_RegDef_t;
 
-#define MCAL_PWR            ((MCAL_PWR_RegDef_t* ) _MMIO_ADDR_PWR)
+#define STM32F4xx_PWR            ((STM32F4xx_PWR_RegDef_t* ) _MMIO_ADDR_PWR)
 
 #define _MMIO_ADDR_BKP      0x40002800UL
 #define _MMIO_ADDR_RCC      0x40023800UL  
 typedef struct
 {
-    volatile uint32_t RCC_CR;           //  0x00 MCAL_RCC clock control register 
-    volatile uint32_t RCC_PLLCFGR;      //  0x04 MCAL_RCC PLL configuration register
-    volatile uint32_t RCC_CFGR;         //  0x08 MCAL_RCC clock configuration register 
-    volatile uint32_t RCC_CIR;          //  0x0C MCAL_RCC clock interrupt register
-    volatile uint32_t RCC_AHB1RSTR;     //  0x10 MCAL_RCC AHB1 peripheral reset register
-    volatile uint32_t RCC_AHB2RSTR;     //  0x14 MCAL_RCC AHB2 peripheral reset register
+    volatile uint32_t RCC_CR;           //  0x00 STM32F4xx_RCC clock control register 
+    volatile uint32_t RCC_PLLCFGR;      //  0x04 STM32F4xx_RCC PLL configuration register
+    volatile uint32_t RCC_CFGR;         //  0x08 STM32F4xx_RCC clock configuration register 
+    volatile uint32_t RCC_CIR;          //  0x0C STM32F4xx_RCC clock interrupt register
+    volatile uint32_t RCC_AHB1RSTR;     //  0x10 STM32F4xx_RCC AHB1 peripheral reset register
+    volatile uint32_t RCC_AHB2RSTR;     //  0x14 STM32F4xx_RCC AHB2 peripheral reset register
     const    uint32_t _reserved_0;      //  0x18 Reserved register space
     const    uint32_t _reserved_1;      //  0x1C Reserved register space
-    volatile uint32_t RCC_APB1RSTR;     //  0x20 MCAL_RCC APB1 peripheral reset register
-    volatile uint32_t RCC_APB2RSTR;     //  0x24 MCAL_RCC APB2 peripheral reset register
+    volatile uint32_t RCC_APB1RSTR;     //  0x20 STM32F4xx_RCC APB1 peripheral reset register
+    volatile uint32_t RCC_APB2RSTR;     //  0x24 STM32F4xx_RCC APB2 peripheral reset register
     const    uint32_t _reserved_2;      //  0x28 Reserved register space
     const    uint32_t _reserved_3;      //  0x2C Reserved register space
-    volatile uint32_t RCC_AHB1ENR;      //  0x30 MCAL_RCC AHB1 peripheral clock enable register
-    volatile uint32_t RCC_AHB2ENR;      //  0x34 MCAL_RCC AHB2 peripheral clock enable register
+    volatile uint32_t RCC_AHB1ENR;      //  0x30 STM32F4xx_RCC AHB1 peripheral clock enable register
+    volatile uint32_t RCC_AHB2ENR;      //  0x34 STM32F4xx_RCC AHB2 peripheral clock enable register
     const    uint32_t _reserved_4;      //  0x38 Reserved register space
     const    uint32_t _reserved_5;      //  0x3C Reserved register space
-    volatile uint32_t RCC_APB1ENR;      //  0x40 MCAL_RCC APB1 peripheral clock enable register
-    volatile uint32_t RCC_APB2ENR;      //  0x44 MCAL_RCC APB2 peripheral clock enable register
+    volatile uint32_t RCC_APB1ENR;      //  0x40 STM32F4xx_RCC APB1 peripheral clock enable register
+    volatile uint32_t RCC_APB2ENR;      //  0x44 STM32F4xx_RCC APB2 peripheral clock enable register
     const    uint32_t _reserved_6;      //  0x48 Reserved register space
     const    uint32_t _reserved_7;      //  0x4C Reserved register space
-    volatile uint32_t RCC_AHB1LPENR;    //  0x50 MCAL_RCC AHB1 peripheral clock enable in low power mode register
-    volatile uint32_t RCC_AHB2LPENR;    //  0x54 MCAL_RCC AHB2 peripheral clock enable in low power mode register
+    volatile uint32_t RCC_AHB1LPENR;    //  0x50 STM32F4xx_RCC AHB1 peripheral clock enable in low power mode register
+    volatile uint32_t RCC_AHB2LPENR;    //  0x54 STM32F4xx_RCC AHB2 peripheral clock enable in low power mode register
     const    uint32_t _reserved_8;      //  0x58 Reserved register space
     const    uint32_t _reserved_9;      //  0x5C Reserved register space
-    volatile uint32_t RCC_APB1LPENR;    //  0x60 MCAL_RCC APB1 peripheral clock enable in low power mode register
-    volatile uint32_t RCC_APB2LPENR;    //  0x64 MCAL_RCC APB2 peripheral clock enabled in low power mode register
+    volatile uint32_t RCC_APB1LPENR;    //  0x60 STM32F4xx_RCC APB1 peripheral clock enable in low power mode register
+    volatile uint32_t RCC_APB2LPENR;    //  0x64 STM32F4xx_RCC APB2 peripheral clock enabled in low power mode register
     const    uint32_t _reserved_10;     //  0x68 Reserved register space
     const    uint32_t _reserved_11;     //  0x6C Reserved register space
-    volatile uint32_t RCC_BDCR;         //  0x70 MCAL_RCC Backup domain control register
-    volatile uint32_t RCC_CSR;          //  0x74 MCAL_RCC clock control & status register
+    volatile uint32_t RCC_BDCR;         //  0x70 STM32F4xx_RCC Backup domain control register
+    volatile uint32_t RCC_CSR;          //  0x74 STM32F4xx_RCC clock control & status register
     const    uint32_t _reserved_12;     //  0x78 Reserved register space
     const    uint32_t _reserved_13;     //  0x7C Reserved register space
-    volatile uint32_t RCC_SSCGR;        //  0x80 MCAL_RCC spread spectrum clock generation register
-    volatile uint32_t RCC_PLLI2SCFGR;   //  0x84 MCAL_RCC PLLI2S configuration register
+    volatile uint32_t RCC_SSCGR;        //  0x80 STM32F4xx_RCC spread spectrum clock generation register
+    volatile uint32_t RCC_PLLI2SCFGR;   //  0x84 STM32F4xx_RCC PLLI2S configuration register
     const    uint32_t _reserved_14;     //  0x88 Reserved register space
-    volatile uint32_t RCC_DCKCFGR;      //  0x8C MCAL_RCC Dedicated Clocks Configuration Register
-} MCAL_RCC_RegDef_t;
+    volatile uint32_t RCC_DCKCFGR;      //  0x8C STM32F4xx_RCC Dedicated Clocks Configuration Register
+} STM32F4xx_RCC_RegDef_t;
 
-#define MCAL_RCC                ((MCAL_RCC_RegDef_t* ) _MMIO_ADDR_RCC)
+#define STM32F4xx_RCC                ((STM32F4xx_RCC_RegDef_t* ) _MMIO_ADDR_RCC)
 
-#define MCAL_GPIOA_PCLK_EN()    (MCAL_RCC->RCC_AHB1ENR |= (1<<0))
-#define MCAL_GPIOA_PCLK_DI()    (MCAL_RCC->RCC_AHB1ENR &= ~(1<<0))
-#define MCAL_GPIOB_PCLK_EN()    (MCAL_RCC->RCC_AHB1ENR |= (1<<1))
-#define MCAL_GPIOB_PCLK_DI()    (MCAL_RCC->RCC_AHB1ENR &= ~(1<<1))
-#define MCAL_GPIOC_PCLK_EN()    (MCAL_RCC->RCC_AHB1ENR |= (1<<2))
-#define MCAL_GPIOC_PCLK_DI()    (MCAL_RCC->RCC_AHB1ENR &= ~(1<<2))
-#define MCAL_GPIOD_PCLK_EN()    (MCAL_RCC->RCC_AHB1ENR |= (1<<3))
-#define MCAL_GPIOD_PCLK_DI()    (MCAL_RCC->RCC_AHB1ENR &= ~(1<<3))
-#define MCAL_GPIOE_PCLK_EN()    (MCAL_RCC->RCC_AHB1ENR |= (1<<4))
-#define MCAL_GPIOE_PCLK_DI()    (MCAL_RCC->RCC_AHB1ENR &= ~(1<<4))
-#define MCAL_GPIOH_PCLK_EN()    (MCAL_RCC->RCC_AHB1ENR |= (1<<7))
-#define MCAL_GPIOH_PCLK_DI()    (MCAL_RCC->RCC_AHB1ENR &= ~(1<<7))
+#define STM32F4xx_GPIOA_PCLK_EN()    (STM32F4xx_RCC->RCC_AHB1ENR |= (1<<0))
+#define STM32F4xx_GPIOA_PCLK_DI()    (STM32F4xx_RCC->RCC_AHB1ENR &= ~(1<<0))
+#define STM32F4xx_GPIOB_PCLK_EN()    (STM32F4xx_RCC->RCC_AHB1ENR |= (1<<1))
+#define STM32F4xx_GPIOB_PCLK_DI()    (STM32F4xx_RCC->RCC_AHB1ENR &= ~(1<<1))
+#define STM32F4xx_GPIOC_PCLK_EN()    (STM32F4xx_RCC->RCC_AHB1ENR |= (1<<2))
+#define STM32F4xx_GPIOC_PCLK_DI()    (STM32F4xx_RCC->RCC_AHB1ENR &= ~(1<<2))
+#define STM32F4xx_GPIOD_PCLK_EN()    (STM32F4xx_RCC->RCC_AHB1ENR |= (1<<3))
+#define STM32F4xx_GPIOD_PCLK_DI()    (STM32F4xx_RCC->RCC_AHB1ENR &= ~(1<<3))
+#define STM32F4xx_GPIOE_PCLK_EN()    (STM32F4xx_RCC->RCC_AHB1ENR |= (1<<4))
+#define STM32F4xx_GPIOE_PCLK_DI()    (STM32F4xx_RCC->RCC_AHB1ENR &= ~(1<<4))
+#define STM32F4xx_GPIOH_PCLK_EN()    (STM32F4xx_RCC->RCC_AHB1ENR |= (1<<7))
+#define STM32F4xx_GPIOH_PCLK_DI()    (STM32F4xx_RCC->RCC_AHB1ENR &= ~(1<<7))
 
-#define MCAL_CRC_PCLK_EN()      (MCAL_RCC->RCC_AHB1ENR |= (1<<12))
-#define MCAL_CRC_PCLK_DI()      (MCAL_RCC->RCC_AHB1ENR &= ~(1<<12))
+#define STM32F4xx_CRC_PCLK_EN()      (STM32F4xx_RCC->RCC_AHB1ENR |= (1<<12))
+#define STM32F4xx_CRC_PCLK_DI()      (STM32F4xx_RCC->RCC_AHB1ENR &= ~(1<<12))
 
-#define MCAL_DMA1_PCLK_EN()     (MCAL_RCC->RCC_AHB1ENR |= (1<<21))
-#define MCAL_DMA1_PCLK_DI()     (MCAL_RCC->RCC_AHB1ENR &= ~(1<<21))
-#define MCAL_DMA2_PCLK_EN()     (MCAL_RCC->RCC_AHB1ENR |= (1<<22))
-#define MCAL_DMA2_PCLK_DI()     (MCAL_RCC->RCC_AHB1ENR &= ~(1<<22))
+#define STM32F4xx_DMA1_PCLK_EN()     (STM32F4xx_RCC->RCC_AHB1ENR |= (1<<21))
+#define STM32F4xx_DMA1_PCLK_DI()     (STM32F4xx_RCC->RCC_AHB1ENR &= ~(1<<21))
+#define STM32F4xx_DMA2_PCLK_EN()     (STM32F4xx_RCC->RCC_AHB1ENR |= (1<<22))
+#define STM32F4xx_DMA2_PCLK_DI()     (STM32F4xx_RCC->RCC_AHB1ENR &= ~(1<<22))
 
-#define MCAL_USB_FS_PCLK_EN()   (MCAL_RCC->RCC_AHB2ENR |= (1<<7))
-#define MCAL_USB_FS_PCLK_DI()   (MCAL_RCC->RCC_AHB2ENR &= ~(1<<7))
+#define STM32F4xx_USB_FS_PCLK_EN()   (STM32F4xx_RCC->RCC_AHB2ENR |= (1<<7))
+#define STM32F4xx_USB_FS_PCLK_DI()   (STM32F4xx_RCC->RCC_AHB2ENR &= ~(1<<7))
 
-#define MCAL_TIM1_PCLK_EN()     (MCAL_RCC->RCC_APB2ENR |= (1<<0))
-#define MCAL_TIM1_PCLK_DI()     (MCAL_RCC->RCC_APB2ENR &= ~(1<<0))
-#define MCAL_TIM2_PCLK_EN()     (MCAL_RCC->RCC_APB1ENR |= (1<<0))
-#define MCAL_TIM2_PCLK_DI()     (MCAL_RCC->RCC_APB1ENR &= ~(1<<0))
-#define MCAL_TIM3_PCLK_EN()     (MCAL_RCC->RCC_APB1ENR |= (1<<1))
-#define MCAL_TIM3_PCLK_DI()     (MCAL_RCC->RCC_APB1ENR &= ~(1<<1))
-#define MCAL_TIM4_PCLK_EN()     (MCAL_RCC->RCC_APB1ENR |= (1<<2))
-#define MCAL_TIM4_PCLK_DI()     (MCAL_RCC->RCC_APB1ENR &= ~(1<<2))
-#define MCAL_TIM5_PCLK_EN()     (MCAL_RCC->RCC_APB1ENR |= (1<<3))
-#define MCAL_TIM5_PCLK_DI()     (MCAL_RCC->RCC_APB1ENR &= ~(1<<3))
+#define STM32F4xx_TIM1_PCLK_EN()     (STM32F4xx_RCC->RCC_APB2ENR |= (1<<0))
+#define STM32F4xx_TIM1_PCLK_DI()     (STM32F4xx_RCC->RCC_APB2ENR &= ~(1<<0))
+#define STM32F4xx_TIM2_PCLK_EN()     (STM32F4xx_RCC->RCC_APB1ENR |= (1<<0))
+#define STM32F4xx_TIM2_PCLK_DI()     (STM32F4xx_RCC->RCC_APB1ENR &= ~(1<<0))
+#define STM32F4xx_TIM3_PCLK_EN()     (STM32F4xx_RCC->RCC_APB1ENR |= (1<<1))
+#define STM32F4xx_TIM3_PCLK_DI()     (STM32F4xx_RCC->RCC_APB1ENR &= ~(1<<1))
+#define STM32F4xx_TIM4_PCLK_EN()     (STM32F4xx_RCC->RCC_APB1ENR |= (1<<2))
+#define STM32F4xx_TIM4_PCLK_DI()     (STM32F4xx_RCC->RCC_APB1ENR &= ~(1<<2))
+#define STM32F4xx_TIM5_PCLK_EN()     (STM32F4xx_RCC->RCC_APB1ENR |= (1<<3))
+#define STM32F4xx_TIM5_PCLK_DI()     (STM32F4xx_RCC->RCC_APB1ENR &= ~(1<<3))
 
-#define MCAL_TIM9_PCLK_EN()     (MCAL_RCC->RCC_APB2ENR |= (1<<16))
-#define MCAL_TIM9_PCLK_DI()     (MCAL_RCC->RCC_APB2ENR &= ~(1<<16))
-#define MCAL_TIM10_PCLK_EN()    (MCAL_RCC->RCC_APB2ENR |= (1<<17))
-#define MCAL_TIM10_PCLK_DI()    (MCAL_RCC->RCC_APB2ENR &= ~(1<<17))
-#define MCAL_TIM11_PCLK_EN()    (MCAL_RCC->RCC_APB2ENR |= (1<<18))
-#define MCAL_TIM11_PCLK_DI()    (MCAL_RCC->RCC_APB2ENR &= ~(1<<18))
+#define STM32F4xx_TIM9_PCLK_EN()     (STM32F4xx_RCC->RCC_APB2ENR |= (1<<16))
+#define STM32F4xx_TIM9_PCLK_DI()     (STM32F4xx_RCC->RCC_APB2ENR &= ~(1<<16))
+#define STM32F4xx_TIM10_PCLK_EN()    (STM32F4xx_RCC->RCC_APB2ENR |= (1<<17))
+#define STM32F4xx_TIM10_PCLK_DI()    (STM32F4xx_RCC->RCC_APB2ENR &= ~(1<<17))
+#define STM32F4xx_TIM11_PCLK_EN()    (STM32F4xx_RCC->RCC_APB2ENR |= (1<<18))
+#define STM32F4xx_TIM11_PCLK_DI()    (STM32F4xx_RCC->RCC_APB2ENR &= ~(1<<18))
 
-#define MCAL_WWDG_PCLK_EN()     (MCAL_RCC->RCC_APB1ENR |= (1<<11))
-#define MCAL_WWDG_PCLK_DI()     (MCAL_RCC->RCC_APB1ENR &= ~(1<<11))
+#define STM32F4xx_WWDG_PCLK_EN()     (STM32F4xx_RCC->RCC_APB1ENR |= (1<<11))
+#define STM32F4xx_WWDG_PCLK_DI()     (STM32F4xx_RCC->RCC_APB1ENR &= ~(1<<11))
 
-#define MCAL_PWR_PCLK_EN()      (MCAL_RCC->RCC_APB1ENR |= (1<<28))
-#define MCAL_PWR_PCLK_DI()      (MCAL_RCC->RCC_APB1ENR &= ~(1<<28))
+#define STM32F4xx_PWR_PCLK_EN()      (STM32F4xx_RCC->RCC_APB1ENR |= (1<<28))
+#define STM32F4xx_PWR_PCLK_DI()      (STM32F4xx_RCC->RCC_APB1ENR &= ~(1<<28))
 
-#define MCAL_I2C1_PCLK_EN()     (MCAL_RCC->RCC_APB1ENR |= (1<<21))
-#define MCAL_I2C1_PCLK_DI()     (MCAL_RCC->RCC_APB1ENR &= ~(1<<21))
-#define MCAL_I2C2_PCLK_EN()     (MCAL_RCC->RCC_APB1ENR |= (1<<22))
-#define MCAL_I2C2_PCLK_DI()     (MCAL_RCC->RCC_APB1ENR &= ~(1<<22))
-#define MCAL_I2C3_PCLK_EN()     (MCAL_RCC->RCC_APB1ENR |= (1<<23))
-#define MCAL_I2C3_PCLK_DI()     (MCAL_RCC->RCC_APB1ENR &= ~(1<<23))
+#define STM32F4xx_I2C1_PCLK_EN()     (STM32F4xx_RCC->RCC_APB1ENR |= (1<<21))
+#define STM32F4xx_I2C1_PCLK_DI()     (STM32F4xx_RCC->RCC_APB1ENR &= ~(1<<21))
+#define STM32F4xx_I2C2_PCLK_EN()     (STM32F4xx_RCC->RCC_APB1ENR |= (1<<22))
+#define STM32F4xx_I2C2_PCLK_DI()     (STM32F4xx_RCC->RCC_APB1ENR &= ~(1<<22))
+#define STM32F4xx_I2C3_PCLK_EN()     (STM32F4xx_RCC->RCC_APB1ENR |= (1<<23))
+#define STM32F4xx_I2C3_PCLK_DI()     (STM32F4xx_RCC->RCC_APB1ENR &= ~(1<<23))
 
-#define MCAL_SPI1_PCLK_EN()     (MCAL_RCC->RCC_APB2ENR |= (1<<12))
-#define MCAL_SPI1_PCLK_DI()     (MCAL_RCC->RCC_APB2ENR &= ~(1<<12))
-#define MCAL_SPI2_PCLK_EN()     (MCAL_RCC->RCC_APB1ENR |= (1<<14))
-#define MCAL_SPI2_PCLK_DI()     (MCAL_RCC->RCC_APB1ENR &= ~(1<<14))
-#define MCAL_SPI3_PCLK_EN()     (MCAL_RCC->RCC_APB1ENR |= (1<<15))
-#define MCAL_SPI3_PCLK_DI()     (MCAL_RCC->RCC_APB1ENR &= ~(1<<15))
-#define MCAL_SPI4_PCLK_EN()     (MCAL_RCC->RCC_APB2ENR |= (1<<13))
-#define MCAL_SPI4_PCLK_DI()     (MCAL_RCC->RCC_APB2ENR &= ~(1<<13))
-#define MCAL_SPI5_PCLK_EN()     (MCAL_RCC->RCC_APB2ENR |= (1<<20))
-#define MCAL_SPI5_PCLK_DI()     (MCAL_RCC->RCC_APB2ENR &= ~(1<<20))
+#define STM32F4xx_SPI1_PCLK_EN()     (STM32F4xx_RCC->RCC_APB2ENR |= (1<<12))
+#define STM32F4xx_SPI1_PCLK_DI()     (STM32F4xx_RCC->RCC_APB2ENR &= ~(1<<12))
+#define STM32F4xx_SPI2_PCLK_EN()     (STM32F4xx_RCC->RCC_APB1ENR |= (1<<14))
+#define STM32F4xx_SPI2_PCLK_DI()     (STM32F4xx_RCC->RCC_APB1ENR &= ~(1<<14))
+#define STM32F4xx_SPI3_PCLK_EN()     (STM32F4xx_RCC->RCC_APB1ENR |= (1<<15))
+#define STM32F4xx_SPI3_PCLK_DI()     (STM32F4xx_RCC->RCC_APB1ENR &= ~(1<<15))
+#define STM32F4xx_SPI4_PCLK_EN()     (STM32F4xx_RCC->RCC_APB2ENR |= (1<<13))
+#define STM32F4xx_SPI4_PCLK_DI()     (STM32F4xx_RCC->RCC_APB2ENR &= ~(1<<13))
+#define STM32F4xx_SPI5_PCLK_EN()     (STM32F4xx_RCC->RCC_APB2ENR |= (1<<20))
+#define STM32F4xx_SPI5_PCLK_DI()     (STM32F4xx_RCC->RCC_APB2ENR &= ~(1<<20))
 
-#define MCAL_USART1_PCLK_EN()   (MCAL_RCC->RCC_APB2ENR |= (1<<4))
-#define MCAL_USART1_PCLK_DI()   (MCAL_RCC->RCC_APB2ENR &= ~(1<<4))
-#define MCAL_USART2_PCLK_EN()   (MCAL_RCC->RCC_APB1ENR |= (1<<17))
-#define MCAL_USART2_PCLK_DI()   (MCAL_RCC->RCC_APB1ENR &= ~(1<<17))
-#define MCAL_USART6_PCLK_EN()   (MCAL_RCC->RCC_APB2ENR |= (1<<5))
-#define MCAL_USART6_PCLK_DI()   (MCAL_RCC->RCC_APB2ENR &= ~(1<<5))
+#define STM32F4xx_USART1_PCLK_EN()   (STM32F4xx_RCC->RCC_APB2ENR |= (1<<4))
+#define STM32F4xx_USART1_PCLK_DI()   (STM32F4xx_RCC->RCC_APB2ENR &= ~(1<<4))
+#define STM32F4xx_USART2_PCLK_EN()   (STM32F4xx_RCC->RCC_APB1ENR |= (1<<17))
+#define STM32F4xx_USART2_PCLK_DI()   (STM32F4xx_RCC->RCC_APB1ENR &= ~(1<<17))
+#define STM32F4xx_USART6_PCLK_EN()   (STM32F4xx_RCC->RCC_APB2ENR |= (1<<5))
+#define STM32F4xx_USART6_PCLK_DI()   (STM32F4xx_RCC->RCC_APB2ENR &= ~(1<<5))
 
-#define MCAL_ADC1_PCLK_EN()     (MCAL_RCC->RCC_APB2ENR |= (1<<8))
-#define MCAL_ADC1_PCLK_DI()     (MCAL_RCC->RCC_APB2ENR &= ~(1<<8))
+#define STM32F4xx_ADC1_PCLK_EN()     (STM32F4xx_RCC->RCC_APB2ENR |= (1<<8))
+#define STM32F4xx_ADC1_PCLK_DI()     (STM32F4xx_RCC->RCC_APB2ENR &= ~(1<<8))
 
-#define MCAL_SDIO_PCLK_EN()     (MCAL_RCC->RCC_APB2ENR |= (1<<11))
-#define MCAL_SDIO_PCLK_DI()     (MCAL_RCC->RCC_APB2ENR &= ~(1<<11))
+#define STM32F4xx_SDIO_PCLK_EN()     (STM32F4xx_RCC->RCC_APB2ENR |= (1<<11))
+#define STM32F4xx_SDIO_PCLK_DI()     (STM32F4xx_RCC->RCC_APB2ENR &= ~(1<<11))
 
-#define MCAL_SYSCFG_PCLK_EN()   (MCAL_RCC->RCC_APB2ENR |= (1<<14))
-#define MCAL_SYSCFG_PCLK_DI()   (MCAL_RCC->RCC_APB2ENR &= ~(1<<14))
+#define STM32F4xx_SYSCFG_PCLK_EN()   (STM32F4xx_RCC->RCC_APB2ENR |= (1<<14))
+#define STM32F4xx_SYSCFG_PCLK_DI()   (STM32F4xx_RCC->RCC_APB2ENR &= ~(1<<14))
 
 typedef struct
 {
@@ -182,26 +182,26 @@ typedef struct
     volatile uint32_t LCKR;     // 0x1C
     volatile uint32_t AFRL;     // 0x20
     volatile uint32_t AFRH;     // 0x24
-} MCAL_GPIO_RegDef_t;
+} STM32F4xx_GPIO_RegDef_t;
 
 
 #define _MMIO_ADDR_GPIOA    0x40020000UL  
-#define MCAL_GPIOA          ((MCAL_GPIO_RegDef_t* ) _MMIO_ADDR_GPIOA)
+#define STM32F4xx_GPIOA          ((STM32F4xx_GPIO_RegDef_t* ) _MMIO_ADDR_GPIOA)
 
 #define _MMIO_ADDR_GPIOB    0x40020400UL
-#define MCAL_GPIOB          ((MCAL_GPIO_RegDef_t* ) _MMIO_ADDR_GPIOB)
+#define STM32F4xx_GPIOB          ((STM32F4xx_GPIO_RegDef_t* ) _MMIO_ADDR_GPIOB)
 
 #define _MMIO_ADDR_GPIOC    0x40020800UL
-#define MCAL_GPIOC          ((MCAL_GPIO_RegDef_t* ) _MMIO_ADDR_GPIOC)
+#define STM32F4xx_GPIOC          ((STM32F4xx_GPIO_RegDef_t* ) _MMIO_ADDR_GPIOC)
 
 #define _MMIO_ADDR_GPIOD    0x40020C00UL
-#define MCAL_GPIOD          ((MCAL_GPIO_RegDef_t* ) _MMIO_ADDR_GPIOD)
+#define STM32F4xx_GPIOD          ((STM32F4xx_GPIO_RegDef_t* ) _MMIO_ADDR_GPIOD)
 
 #define _MMIO_ADDR_GPIOE    0x40021000UL
-#define MCAL_GPIOE          ((MCAL_GPIO_RegDef_t* ) _MMIO_ADDR_GPIOE)
+#define STM32F4xx_GPIOE          ((STM32F4xx_GPIO_RegDef_t* ) _MMIO_ADDR_GPIOE)
 
 #define _MMIO_ADDR_GPIOH    0x40021C00UL
-#define MCAL_GPIOH          ((MCAL_GPIO_RegDef_t* ) _MMIO_ADDR_GPIOH)
+#define STM32F4xx_GPIOH          ((STM32F4xx_GPIO_RegDef_t* ) _MMIO_ADDR_GPIOH)
 
 
 #define _MMIO_ADDR_EXTI     0x40013C00UL
@@ -214,13 +214,11 @@ typedef struct
     volatile uint32_t EXTI_FTSR;    // 0x0C Falling trigger selection register
     volatile uint32_t EXTI_SWIER;   // 0x10 Software interrupt event register 
     volatile uint32_t EXTI_PR;      // 0x14 Pending register
-} MCAL_EXTI_RegDef_t;
+} STM32F4xx_EXTI_RegDef_t;
 
-#define MCAL_EXTI          ((MCAL_EXTI_RegDef_t* ) _MMIO_ADDR_EXTI)
+#define STM32F4xx_EXTI          ((STM32F4xx_EXTI_RegDef_t* ) _MMIO_ADDR_EXTI)
 
-#define _MMIO_ADDR_ADC1     0x40012000UL
-#define _MMIO_ADDR_ADC2     0x40012800UL
-#define _MMIO_ADDR_ADC3     0x40013C00UL
+#define _MMIO_ADDR_ADC      0x40012000UL
 
 #define _MMIO_ADDR_DMA1     0x40026000UL
 #define _MMIO_ADDR_DMA2     0x40026400UL
@@ -245,6 +243,31 @@ typedef struct
 
 #define _MMIO_ADDR_RTC      0x40002800UL 
 
+typedef struct
+{
+    volatile uint32_t RTC_TR;       // 0x00 RTC time register
+    volatile uint32_t RTC_DR;       // 0x04 RTC date register
+    volatile uint32_t RTC_CR;       // 0x08 RTC control register
+    volatile uint32_t RTC_ISR;      // 0x0C RTC initialization and status register
+    volatile uint32_t RTC_PRER;     // 0x10 RTC prescaler register 
+    volatile uint32_t RTC_WUTR;     // 0x14 RTC wakeup timer register 
+    volatile uint32_t RTC_CALIBR;   // 0x18 RTC calibration register
+    volatile uint32_t RTC_ALRMAR;   // 0x1C RTC alarm A register
+    volatile uint32_t RTC_ALRMBR;   // 0x20 RTC alarm B register
+    volatile uint32_t RTC_WPR;      // 0x24 RTC write protection register
+    volatile uint32_t RTC_SSR;      // 0x28 RTC sub second register
+    volatile uint32_t RTC_SHIFTR;   // 0x2C RTC shift control register
+    volatile uint32_t RTC_TSTR;     // 0x30 RTC time stamp time register
+    volatile uint32_t RTC_TSSSR;    // 0x34 RTC time stamp date register 
+    volatile uint32_t RTC_CALR;     // 0x38 RTC timestamp sub second register 
+    volatile uint32_t RTC_TAFCR;    // 0x3C RTC tamper and alternate function configuration register
+    volatile uint32_t RTC_ALRMASSR; // 0x40 RTC alarm A sub second register
+    volatile uint32_t RTC_ALRMBSSR; // 0x44 RTC alarm B sub second register 
+    volatile uint32_t RTC_BKPR[20]; // 0x48 RTC backup registers
+} STM32F4xx_RTC_RegDef_t;
+
+#define STM32F4XX_RTC_REG   ((STM32F4xx_RTC_RegDef_t* ) _MMIO_ADDR_RTC)
+
 #define _MMIO_ADDR_IWDG     0x40003000UL 
 #define _MMIO_ADDR_WWDG     0x40002C00UL
 
@@ -267,9 +290,26 @@ typedef struct
 #define _MMIO_ADDR_I2S2_ext 0x40003400UL  
 #define _MMIO_ADDR_I2S3_ext 0x40004000UL 
 
+typedef struct
+{
+    volatile uint32_t I2C_CR1;      // 0x00 I2C Control register 1
+    volatile uint32_t I2C_CR2;      // 0x04 I2C Control register 2
+    volatile uint32_t I2C_OAR1;     // 0x08 I2C Own address register 1 
+    volatile uint32_t I2C_OAR2;     // 0x0C I2C Own address register 2
+    volatile uint32_t I2C_DR;       // 0x10 I2C Data register 
+    volatile uint32_t I2C_SR1;      // 0x14 I2C Status register 1
+    volatile uint32_t I2C_SR2;      // 0x18 I2C Status register 2 
+    volatile uint32_t I2C_CCR;      // 0x1C I2C Clock control register 
+    volatile uint32_t I2C_TRISE;    // 0x20 I2C TRISE register 
+    volatile uint32_t I2C_FLTR;     // 0x24 I2C FLTR register
+} STM32F4xx_I2C_RegDef_t;
+
 #define _MMIO_ADDR_I2C1     0x40005400UL
+#define STM32F4XX_RTC_REG   ((STM32F4xx_I2C_RegDef_t* ) _MMIO_ADDR_I2C1)
 #define _MMIO_ADDR_I2C2     0x40005800UL 
+#define STM32F4XX_RTC_REG   ((STM32F4xx_I2C_RegDef_t* ) _MMIO_ADDR_I2C2)
 #define _MMIO_ADDR_I2C3     0x40005C00UL  
+#define STM32F4XX_RTC_REG   ((STM32F4xx_I2C_RegDef_t* ) _MMIO_ADDR_I2C3)
 
 #define _MMIO_ADDR_USART1   0x40011000UL
 #define _MMIO_ADDR_USART2   0x40004400UL
@@ -295,8 +335,8 @@ typedef struct
     const    uint32_t _reserved_1;      //  0x18 reserved
     const    uint32_t _reserved_2;      //  0x1C reserved
     volatile uint32_t SYSCFG_CMPCR;     //  0x20 Compensation cell control register
-} MCAL_SYSCFG_RegDef_t;
+} STM32F4xx_SYSCFG_RegDef_t;
 
-#define MCAL_SYSCFG              ((MCAL_SYSCFG_RegDef_t* ) _MMIO_ADDR_SYSCFG)
+#define STM32F4xx_SYSCFG              ((STM32F4xx_SYSCFG_RegDef_t* ) _MMIO_ADDR_SYSCFG)
 
 #endif
