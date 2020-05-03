@@ -44,10 +44,18 @@ typedef enum _I2CIf_flags
     I2CIF_SEND_NACK                 = 0x08, // send not acknowledge
 } I2CIf_flags_t;
 
+typedef enum _I2CIf_duty_cycle
+{
+    I2CIF_DUTY_CYCLE_1_1            = 0x00, // T_low of clock equals T_high of clock 
+    I2CIF_DUTY_CYCLE_2_1            = 0x01, // T_low of clock double T_high of clock
+    I2CIF_DUTY_CYCLE_16_9           = 0x02, // T_low to T_high ration is 16:9
+} I2CIf_duty_cycle_t;
+
 typedef struct _I2CIf_I2CIf_status
 {
     uint16_t start_bit_sent         :   1;
-    uint16_t addres_sent_matched    :   1;
+    uint16_t address_sent           :   1;
+    uint16_t address_matched        :   1;
     uint16_t header_10bit_sent      :   1;
     uint16_t stop_received          :   1;
     uint16_t transmit_finished      :   1;
@@ -60,25 +68,38 @@ typedef struct _I2CIf_I2CIf_status
     uint16_t overrung_underrun      :   1;
     uint16_t PEC_error              :   1;
     uint16_t timeout                :   1;
-    uint16_t smb_aller              :   1;
     uint16_t general_addr_call_rcv  :   1;
 } I2CIf_status_t;
 
 
+typedef struct _I2CIf_slave_config
+{
+    uint16_t slave_address;                                     // slave address of device
+    uint16_t slave_address_2;                                   // 2nd slave address of device, if supported
+    uint16_t slave_address_msk;                                 // slave address masking, 1 if bit shall be ignored, if supported
+    boolean clock_strech_en;                                    // enable clock stretching
+    boolean default_addr_listening_en;                          // enable listening to default address
+    void (*receive_callback)(I2CIf_status_t, uint8_t);          // callback function for starting transmission and finish of write
+    uint8_t (*request_callback)(I2CIf_status_t);                // callback function for starting transmission and finish of write
+} I2CIf_slave_cfg_t;
+
+typedef struct _I2CIf_master_config
+{
+    void (*send_callback)(I2CIf_status_t);                      // callback function when the write cycle has finished
+    void (*read_callback)(I2CIf_status_t,uint8_t, uint8_t*);    // callback to return buffer and read length when read is finished
+    void (*error_callback)(I2CIf_status_t);                     // callback if a error was detected
+    uint16_t frequency_divider;                                 // divider of the peripheral clock for chosen speed
+    uint8_t prescaler;                                          // prescaler for the peripheral
+    I2CIf_speed_mode_t speed;                                   // on which speed the I2C bus shall operate
+    I2CIf_duty_cycle_t duty_cycle;                              // duty cycle of generated clock
+} I2CIf_master_config;
+
 typedef struct _I2CIf_handle
 { 
-    void (*send_callback)(I2CIf_status_t);  // callback function for starting transmission and finish of write
-    void (*read_callback)(I2CIf_status_t,uint8_t*);          // callback to return buffer when read is finished
-    void (*error_callback)(I2CIf_status_t); // callback if a error was detected
-    uint16_t frequency_divider;             // divider of the peripheral clock for chosen speed
-    uint8_t prescaler;                      // prescaler for the peripheral
-    I2CIf_speed_mode_t speed;               // on which speed the I2C bus shall operate
-    I2CIf_device_mode_t device_mode;        // in which mode the MCU shall eact
-    I2CIf_address_mode_t addr_mode;         // address mode of I2C bus
-    uint16_t slave_address;                 // slave address of device
-    boolean clock_strech_en;                // enable clock stretching
-    boolean default_addr_listening_en;      // enable listening to default address
-    boolean use_smbus_mode;                 // I2C peripheral shall act like a SMBus device
+    I2CIf_master_config *master_cfg;                            // configeration if devices operates as master
+    I2CIf_slave_cfg_t *slave_cfg;                               // configuration if devices operates as slave
+    I2CIf_device_mode_t device_mode;                            // in which mode the MCU shall eact
+    I2CIf_address_mode_t addr_mode;                             // address mode of I2C bus
 } I2CIf_handle_t;
 
 
@@ -112,7 +133,8 @@ std_return_type_t I2CIf_deinit(identifier_t i2c_bus_id);
  *  
  * This function configures a given I2C bus
  * 
- * @param  I2CIf_handle_t bus_cfg   : I2C bus configuration 
+ * @param  identifier_t i2c_bus_id  : I2C bus to be configured
+ * @param  I2CIf_handle_t *bus_cfg  : I2C bus configuration 
  * @return std_return_type_t status : If the bus id does not exist on the host
  *                                    the function returns E_NOT_EXISTING. If
  *                                    prescaler if the prescaler value is supported
@@ -122,7 +144,7 @@ std_return_type_t I2CIf_deinit(identifier_t i2c_bus_id);
  *                                    function returns E_NOT_SUPPORTED. Else it 
  *                                    returns E_OK.
  */
-std_return_type_t I2CIf_config(I2CIf_handle_t bus_cfg);
+std_return_type_t I2CIf_config(identifier_t i2c_bus_id, I2CIf_handle_t *bus_cfg);
 
 /**
  * @brief Transmits data via I2C
