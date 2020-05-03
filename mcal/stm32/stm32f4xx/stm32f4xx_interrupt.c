@@ -12,7 +12,7 @@
 #include "stm32f4xx_interrupt.h"
 #include "stm32f4xx.h"
 
-boolean stm32f4xx_irq_exists(MCAL_IRQ_t irq);
+boolean stm32f4xx_irq_exists(STM32F4xx_IRQ_t irq);
 
 // unused IRQ IDs
 uint8_t unused_IRQs[] = {19, 20, 21,22, 39, 42, 43, 44, 45, 46, 48, 61, 62, 63, 64, 65, 66, 74,75,76,77,78,79,80};
@@ -96,7 +96,7 @@ const DeviceVectors exception_table = {
 };
 
 
-std_return_type_t stm32f4xx_enable_interrupt(MCAL_IRQ_t irq)
+std_return_type_t stm32f4xx_enable_interrupt(STM32F4xx_IRQ_t irq)
 {
     if(stm32f4xx_irq_exists(irq) == FALSE)
     {
@@ -106,12 +106,12 @@ std_return_type_t stm32f4xx_enable_interrupt(MCAL_IRQ_t irq)
     uint8_t reg_no = irq >> 5;      // devide by 32 to get NVIC register number 
     uint8_t reg_pos = irq & 0x1F;   // 32-1, mask out last 5 bits to get position inside register
 
-    MCAL_NVIC->NVIC_ISER[reg_no] |= (1 << reg_pos);
+    STM32F4xx_NVIC->NVIC_ISER[reg_no] |= (1 << reg_pos);
 
     return E_OK;
 }
 
-std_return_type_t stm32f4xx_disable_interrupt(MCAL_IRQ_t irq)
+std_return_type_t stm32f4xx_disable_interrupt(STM32F4xx_IRQ_t irq)
 {
     if(stm32f4xx_irq_exists(irq) == FALSE)
     {
@@ -121,14 +121,14 @@ std_return_type_t stm32f4xx_disable_interrupt(MCAL_IRQ_t irq)
     uint8_t reg_no = irq >> 5;      // devide by 32 to get NVIC register number 
     uint8_t reg_pos = irq & 0x1F;   // 32-1, mask out last 5 bits to get position inside register
 
-    MCAL_NVIC->NVIC_ICER[reg_no] |= (1 << reg_pos);
+    STM32F4xx_NVIC->NVIC_ICER[reg_no] |= (1 << reg_pos);
 
     return E_OK;
 }
 
-boolean stm32f4xx_irq_exists(MCAL_IRQ_t irq)
+boolean stm32f4xx_irq_exists(STM32F4xx_IRQ_t irq)
 {
-    if(irq > MCAL_STM32F4XX_MAX_IRQ)
+    if(irq > STM32F4xx_STM32F4XX_MAX_IRQ)
     {
         return FALSE;
     }

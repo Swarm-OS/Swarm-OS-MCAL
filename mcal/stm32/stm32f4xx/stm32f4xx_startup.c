@@ -11,7 +11,7 @@
  */
 
 
-#ifndef MCAL_EXTERNAL_RESET_HANDLER
+#ifndef STM32F4xx_EXTERNAL_RESET_HANDLER
 
 #include <stdint.h>
 #include "stm32f4xx_interrupt.h"

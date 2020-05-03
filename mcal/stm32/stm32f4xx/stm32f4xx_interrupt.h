@@ -8,8 +8,8 @@
  * interrupts
  */
 
-#ifndef MCAL_INTERRUPT_STM32F411XX_H
-#define MCAL_INTERRUPT_STM32F411XX_H
+#ifndef STM32F4xx_INTERRUPT_STM32F411XX_H
+#define STM32F4xx_INTERRUPT_STM32F411XX_H
 
 #include "datatypes.h"
 
@@ -196,79 +196,79 @@ void __attribute__((weak)) SPI5_Handler(void);
 // IRQ Numbers
 typedef enum
 {
-    MCAL_WWDG_IRQ               =    0,
-    MCAL_EXTI16_PVD_IRQ         =    1,
-    MCAL_EXTI21_TAMP_STAMP_IRQ  =    2,
-    MCAL_EXTI22_RTC_WKUP_IRQ    =    3,
-    MCAL_FLASH_IRQ              =    4,
-    MCAL_RCC_IRQ                =    5,
-    MCAL_EXTI0_IRQ              =    6,
-    MCAL_EXTI1_IRQ              =    7,
-    MCAL_EXTI2_IRQ              =    8,
-    MCAL_EXTI3_IRQ              =    9,
-    MCAL_EXTI4_IRQ              =   10,
-    MCAL_DMA1_STREAM0_IRQ       =   11,
-    MCAL_DMA1_STREAM1_IRQ       =   12,
-    MCAL_DMA1_STREAM2_IRQ       =   13,
-    MCAL_DMA1_STREAM3_IRQ       =   14,
-    MCAL_DMA1_STREAM4_IRQ       =   15,
-    MCAL_DMA1_STREAM5_IRQ       =   16,
-    MCAL_DMA1_STREAM6_IRQ       =   17,
-    MCAL_ADC_IRQ                =   18,
+    STM32F4xx_WWDG_IRQ               =    0,
+    STM32F4xx_EXTI16_PVD_IRQ         =    1,
+    STM32F4xx_EXTI21_TAMP_STAMP_IRQ  =    2,
+    STM32F4xx_EXTI22_RTC_WKUP_IRQ    =    3,
+    STM32F4xx_FLASH_IRQ              =    4,
+    STM32F4xx_RCC_IRQ                =    5,
+    STM32F4xx_EXTI0_IRQ              =    6,
+    STM32F4xx_EXTI1_IRQ              =    7,
+    STM32F4xx_EXTI2_IRQ              =    8,
+    STM32F4xx_EXTI3_IRQ              =    9,
+    STM32F4xx_EXTI4_IRQ              =   10,
+    STM32F4xx_DMA1_STREAM0_IRQ       =   11,
+    STM32F4xx_DMA1_STREAM1_IRQ       =   12,
+    STM32F4xx_DMA1_STREAM2_IRQ       =   13,
+    STM32F4xx_DMA1_STREAM3_IRQ       =   14,
+    STM32F4xx_DMA1_STREAM4_IRQ       =   15,
+    STM32F4xx_DMA1_STREAM5_IRQ       =   16,
+    STM32F4xx_DMA1_STREAM6_IRQ       =   17,
+    STM32F4xx_ADC_IRQ                =   18,
     // 19 - 22 unused
-    MCAL_EXTI9_5_IRQ            =   23,
-    MCAL_TIM1_BRK_TIM9_IRQ      =   24,
-    MCAL_TIM1_UP_TIM10_IRQ      =   25,
-    MCAL_TIM1_TRG_COM_TIM11_IRQ =   26, 
-    MCAL_TIM1_CC_IRQ            =   27,
-    MCAL_TIM2_IRQ               =   28,
-    MCAL_TIM3_IRQ               =   29,
-    MCAL_TIM4_IRQ               =   30,
-    MCAL_I2C1_EV_IRQ            =   31,
-    MCAL_I2C1_ER_IRQ            =   32,
-    MCAL_I2C2_EV_IRQ            =   33,
-    MCAL_I2C2_ER_IRQ            =   34,
-    MCAL_SPI1_IRQ               =   35,
-    MCAL_SPI2_IRQ               =   36,
-    MCAL_USART1_IRQ             =   37,
-    MCAL_USART2_IRQ             =   38,
+    STM32F4xx_EXTI9_5_IRQ            =   23,
+    STM32F4xx_TIM1_BRK_TIM9_IRQ      =   24,
+    STM32F4xx_TIM1_UP_TIM10_IRQ      =   25,
+    STM32F4xx_TIM1_TRG_COM_TIM11_IRQ =   26, 
+    STM32F4xx_TIM1_CC_IRQ            =   27,
+    STM32F4xx_TIM2_IRQ               =   28,
+    STM32F4xx_TIM3_IRQ               =   29,
+    STM32F4xx_TIM4_IRQ               =   30,
+    STM32F4xx_I2C1_EV_IRQ            =   31,
+    STM32F4xx_I2C1_ER_IRQ            =   32,
+    STM32F4xx_I2C2_EV_IRQ            =   33,
+    STM32F4xx_I2C2_ER_IRQ            =   34,
+    STM32F4xx_SPI1_IRQ               =   35,
+    STM32F4xx_SPI2_IRQ               =   36,
+    STM32F4xx_USART1_IRQ             =   37,
+    STM32F4xx_USART2_IRQ             =   38,
     // 39 unused
-    MCAL_EXTI15_10_IRQ          =   40,
-    MCAL_EXTI17_RTC_ALARM_IRQ   =   41,
-    MCAL_EXTI18_OTG_FS_WKUP_IRQ =   42,
+    STM32F4xx_EXTI15_10_IRQ          =   40,
+    STM32F4xx_EXTI17_RTC_ALARM_IRQ   =   41,
+    STM32F4xx_EXTI18_OTG_FS_WKUP_IRQ =   42,
     // 42 - 46 unused
-    MCAL_DMA1_STREAM7_IRQ       =   47,
+    STM32F4xx_DMA1_STREAM7_IRQ       =   47,
     // 48 unused
-    MCAL_SDIO_IRQ               =   49,
-    MCAL_TIM5_IRQ               =   50,
-    MCAL_SPI3_IRQ               =   51,
+    STM32F4xx_SDIO_IRQ               =   49,
+    STM32F4xx_TIM5_IRQ               =   50,
+    STM32F4xx_SPI3_IRQ               =   51,
     // 52 - 55 unused
-    MCAL_DMA2_STREAM0_IRQ       =   56,
-    MCAL_DMA2_STREAM1_IRQ       =   57,
-    MCAL_DMA2_STREAM2_IRQ       =   58,
-    MCAL_DMA2_STREAM3_IRQ       =   59,
-    MCAL_DMA2_STREAM4_IRQ       =   60,
+    STM32F4xx_DMA2_STREAM0_IRQ       =   56,
+    STM32F4xx_DMA2_STREAM1_IRQ       =   57,
+    STM32F4xx_DMA2_STREAM2_IRQ       =   58,
+    STM32F4xx_DMA2_STREAM3_IRQ       =   59,
+    STM32F4xx_DMA2_STREAM4_IRQ       =   60,
     // 61 - 66 unused
-    MCAL_OTG_FS_IRQ             =   67,
-    MCAL_DMA2_STREAM5_IRQ       =   68,
-    MCAL_DMA2_STREAM6_IRQ       =   69,
-    MCAL_DMA2_STREAM7_IRQ       =   70,
-    MCAL_USART6_IRQ             =   71,
-    MCAL_I2C3_EV_IRQ            =   72,
-    MCAL_I2C3_ER_IRQ            =   73,
+    STM32F4xx_OTG_FS_IRQ             =   67,
+    STM32F4xx_DMA2_STREAM5_IRQ       =   68,
+    STM32F4xx_DMA2_STREAM6_IRQ       =   69,
+    STM32F4xx_DMA2_STREAM7_IRQ       =   70,
+    STM32F4xx_USART6_IRQ             =   71,
+    STM32F4xx_I2C3_EV_IRQ            =   72,
+    STM32F4xx_I2C3_ER_IRQ            =   73,
     // 74 - 80 unused
-    MCAL_FPU_IRQ                =   81,
-    MCAL_SPI4_IRQ               =   84,
-    MCAL_SPI5_IRQ               =   85,
-} MCAL_IRQ_t;
+    STM32F4xx_FPU_IRQ                =   81,
+    STM32F4xx_SPI4_IRQ               =   84,
+    STM32F4xx_SPI5_IRQ               =   85,
+} STM32F4xx_IRQ_t;
 
-#define MCAL_STM32F4XX_MAX_IRQ  85
+#define STM32F4xx_STM32F4XX_MAX_IRQ  85
 
-std_return_type_t stm32f4xx_enable_interrupt(MCAL_IRQ_t irq);
+std_return_type_t stm32f4xx_enable_interrupt(STM32F4xx_IRQ_t irq);
 
-std_return_type_t stm32f4xx_disable_interrupt(MCAL_IRQ_t irq);
+std_return_type_t stm32f4xx_disable_interrupt(STM32F4xx_IRQ_t irq);
 
-std_return_type_t stm32f4xx_set_interrupt_priority(MCAL_IRQ_t irq, uint8_t priority);
+std_return_type_t stm32f4xx_set_interrupt_priority(STM32F4xx_IRQ_t irq, uint8_t priority);
 
 
 
