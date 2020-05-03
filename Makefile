@@ -30,25 +30,51 @@ local_srcs	+= $(wildcard $(local_src_dir)/*.c)
 ifneq (,$(findstring STM32,$(MCU)))
 	local_srcs	+= $(wildcard $(local_src_dir)/stm32/*.c)
 	local_srcs	+= $(wildcard $(local_src_dir)/stm32/*/*.c)
+#	local_srcs	+= $(wildcard $(local_src_dir)/stm32/*/startup_stm32f411xe.s)
 $(info $$local_srcs is [${local_srcs}])
 else
 $(error Unknown MCU Vendor/Major architecture)
 endif
 
-local_objects	= $(local_srcs:$(local_src_dir)%.c=$(local_obj_dir)%.o)
+local_objects_tmp	= $(local_srcs:$(local_src_dir)%.c=$(local_obj_dir)%.o)
+local_objects		= $(local_objects_tmp:$(local_src_dir)%.s=$(local_obj_dir)%.o)
 $(info $$local_objects is [${local_objects}])
 
-CCLD        = arm-none-eabi-gcc
-CCFLAGS		= -mcpu=cortex-m4 -DSTM32F411 -Wall -mthumb -I ./includes/ -I ./mcal/
-LDFLAGS		= -T ./mcal/stm32/stm32f4xx/stm32f411.ld --specs=nosys.specs -L ./includes/
 
-all: $(local_obj_dir) $(local_objects) $(FILENAME).elf
+AS 			= arm-none-eabi-as
+ASFLAGS		= 
 
-$(FILENAME).elf: $(local_objects)
-	$(CCLD) $(LDFLAGS) -o $@ $(local_objects) 
+CC	        = arm-none-eabi-gcc
+CCFLAGS		= -mcpu=cortex-m4 -DSTM32F411 -Wall -mthumb -ffunction-sections -fdata-sections
+CCFLAGS	   += -I ./includes/ -I ./mcal/
+
+LD        	= arm-none-eabi-gcc
+LDFLAGS	    = -T ./mcal/swarm-os.ld
+#LDFLAGS		= -T ./mcal/stm32/stm32f4xx/stm32f411.ld
+LDFLAGS	   += --specs=nosys.specs -L ./includes
+
+OBJCPY		= arm-none-eabi-objcopy
+OBJCPY_FLAGS= -O binary 
+
+PROG		= sudo dfu-util
+PROG_FLAGS	= -d 0483:df11 -a 0 -s 0x08000000 
+# $(local_obj_dir) $(local_objects)
+all: $(FILENAME).bin
+
+install: $(FILENAME).bin
+	$(PROG) $(PROG_FLAGS) -D $<
+
+$(FILENAME).bin: $(FILENAME).elf
+	$(OBJCPY) $(OBJCPY_FLAGS) $< $@
+
+$(FILENAME).elf: $(local_obj_dir)  $(local_objects) 
+	$(LD) $(LDFLAGS) -o $@ $(local_objects) 
 
 $(local_obj_dir)/%.o: $(local_src_dir)/%.c
-	$(CCLD) $(CCFLAGS) -c -o $@ $<
+	$(CC) $(CCFLAGS) -c -o $@ $<
+
+$(local_obj_dir)/%.o: $(local_src_dir)/%.s
+	$(AS) $(ASFLAGS) -o $@ $<
 
 $(local_obj_dir):
 	mkdir -p $(dir $(local_objects))
