@@ -191,5 +191,14 @@ const char * SysClockIf_get_clock_name(identifier_t id);
  */
 uint8_t SysClockIf_get_number_of_clocks(void);
 
+/**
+ * @brief Get current frequency of a clock
+ *  
+ * This function returns frequency of a clock
+ * 
+ * @param  identifier_t id          : Clock id
+ * @return uint32_t frequency       : Clock frequency
+ */
+uint32_t SysClockIf_get_clock_frequency(identifier_t id);
 
 #endif
