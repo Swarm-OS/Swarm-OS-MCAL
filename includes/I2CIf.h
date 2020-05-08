@@ -28,7 +28,7 @@ typedef enum _I2CIf_address_mode
     I2CIF_ADDRESS_10BIT             = 0x02, // use 10 Bit address mode
 } I2CIf_address_mode_t;
 
-typedef enum _I2CIf_address_mode
+typedef enum _I2CIf_speed_mode
 {
     I2CIF_MODE_SM                   = 0x01, // use I2C standard mode
     I2CIF_MODE_FM                   = 0x02, // use I2C fast mode
@@ -51,7 +51,19 @@ typedef enum _I2CIf_duty_cycle
     I2CIF_DUTY_CYCLE_16_9           = 0x02, // T_low to T_high ration is 16:9
 } I2CIf_duty_cycle_t;
 
-typedef struct _I2CIf_I2CIf_status
+typedef enum _I2CIf_bus_state
+{
+    I2CIF_STATE_IDLE                = 0x00, // Bus is idle, no communication is taking place
+    I2CIF_STATE_BUSY                = 0x01, // Bus is corrently in used by other devices
+    I2CIF_STATE_ARBITRATION         = 0x02, // Device tries to get the arbitration of the bus i.e. waiting on successful send of start condition
+    I2CIF_STATE_MASTER_TRANSMITTER  = 0x10, // This device is active as master transmitter
+    I2CIF_STATE_MASTER_RECEiVER     = 0x11, // This device is active as master receiver
+    I2CIF_STATE_SLAVE_TRANSMITTER   = 0x20, // This device is active as slave transmitter
+    I2CIF_STATE_SLAVE_RECEiVER      = 0x21, // This device is active as slave receiver
+    
+} I2CIf_bus_state_t;
+
+typedef struct _I2CIf_status
 {
     uint16_t start_bit_sent         :   1;
     uint16_t address_sent           :   1;
@@ -88,8 +100,8 @@ typedef struct _I2CIf_master_config
     void (*send_callback)(I2CIf_status_t);                      // callback function when the write cycle has finished
     void (*read_callback)(I2CIf_status_t,uint8_t, uint8_t*);    // callback to return buffer and read length when read is finished
     void (*error_callback)(I2CIf_status_t);                     // callback if a error was detected
-    uint16_t frequency_divider;                                 // divider of the peripheral clock for chosen speed
-    uint8_t prescaler;                                          // prescaler for the peripheral
+    uint32_t scl_frequency;                                     // desired frequency of the I2C Serial Clock
+    uint16_t prescaler;                                         // prescaler for the peripheral
     I2CIf_speed_mode_t speed;                                   // on which speed the I2C bus shall operate
     I2CIf_duty_cycle_t duty_cycle;                              // duty cycle of generated clock
 } I2CIf_master_config;
@@ -137,12 +149,12 @@ std_return_type_t I2CIf_deinit(identifier_t i2c_bus_id);
  * @param  I2CIf_handle_t *bus_cfg  : I2C bus configuration 
  * @return std_return_type_t status : If the bus id does not exist on the host
  *                                    the function returns E_NOT_EXISTING. If
- *                                    prescaler if the prescaler value is supported
- *                                    or the frequency devider is out of range,
+ *                                    prescaler if the prescaler value is no
+ *                                    supported or the scl frequency is out of range,
  *                                    the function returns E_VALUE_OUT_OF_RANGE.
- *                                    If one of the modes is not supported the 
- *                                    function returns E_NOT_SUPPORTED. Else it 
- *                                    returns E_OK.
+ *                                    If one of the device modes or duty cycle is 
+ *                                    not supported the function returns E_NOT_SUPPORTED. 
+ *                                    Else it returns E_OK.
  */
 std_return_type_t I2CIf_config(identifier_t i2c_bus_id, I2CIf_handle_t *bus_cfg);
 
