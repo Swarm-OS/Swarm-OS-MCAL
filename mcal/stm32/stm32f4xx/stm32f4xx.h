@@ -255,7 +255,7 @@ typedef union __STM32F4xx_RTC_TR_Regdef
         volatile uint32_t MNU           :   4;  // Byte 1, Bit 0-3 |  8-11
         volatile uint32_t MNT           :   3;  // Byte 1, Bit 4-6 | 12-14
         const uint32_t _reserved_3      :   1;  // Byte 1, Bit   7 |    15
-        volatile uint32_t SUB           :   4;  // Byte 0, Bit 0-3 |  0- 3
+        volatile uint32_t SU            :   4;  // Byte 0, Bit 0-3 |  0- 3
         volatile uint32_t ST            :   3;  // Byte 0, Bit 4-6 |  4- 6
         const uint32_t _reserved_4      :   1;  // Byte 0, Bit   7 |     7
     };
@@ -270,7 +270,7 @@ typedef union __STM32F4xx_RTC_DR_Regdef
         volatile uint32_t YU            :   4;  // Byte 2, Bit 0-3 | 16-19
         volatile uint32_t YT            :   4;  // Byte 2, Bit 4-7 | 20-23
         volatile uint32_t MU            :   4;  // Byte 1, Bit 0-3 |  8-11
-        volatile uint32_t MN            :   1;  // Byte 1, Bit   6 |    12
+        volatile uint32_t MT            :   1;  // Byte 1, Bit   6 |    12
         volatile uint32_t WDU           :   3;  // Byte 1, Bit   7 | 13-15
         volatile uint32_t DU            :   4;  // Byte 0, Bit 0-3 |  0- 3
         volatile uint32_t DT            :   2;  // Byte 0, Bit 4-5 |  4- 5
@@ -340,9 +340,10 @@ typedef union __STM32F4xx_RTC_PRER_Regdef
     struct
     {
         const uint32_t _reserved_1      :   8;  // Byte 3, Bit 0-7 | 24-31
-        volatile uint32_t PREDIV_A      :   8;  // Byte 2, Bit 0-7 | 16-23
+        volatile uint32_t PREDIV_A      :   7;  // Byte 2, Bit 0-6 | 16-22
+        const uint32_t _reserved_2      :   1;  // Byte 2, Bit   7 |    23
         volatile uint32_t PREDIV_S_H    :   7;  // Byte 1, Bit 0-6 |  7-14
-        const uint32_t _reserved_1      :   1;  // Byte 1, Bit   7 |    15
+        const uint32_t _reserved_3      :   1;  // Byte 1, Bit   7 |    15
         volatile uint32_t PREDIV_S_L    :   8;  // Byte 0, Bit 0-7 |  0- 7
     };
     uint32_t raw;
@@ -754,11 +755,11 @@ typedef struct
 } STM32F4xx_I2C_RegDef_t;
 
 #define _MMIO_ADDR_I2C1     0x40005400UL
-#define STM32F4XX_RTC_REG   ((STM32F4xx_I2C_RegDef_t* ) _MMIO_ADDR_I2C1)
+#define STM32F4XX_I2C1_REG   ((STM32F4xx_I2C_RegDef_t* ) _MMIO_ADDR_I2C1)
 #define _MMIO_ADDR_I2C2     0x40005800UL 
-#define STM32F4XX_RTC_REG   ((STM32F4xx_I2C_RegDef_t* ) _MMIO_ADDR_I2C2)
+#define STM32F4XX_I2C2_REG   ((STM32F4xx_I2C_RegDef_t* ) _MMIO_ADDR_I2C2)
 #define _MMIO_ADDR_I2C3     0x40005C00UL  
-#define STM32F4XX_RTC_REG   ((STM32F4xx_I2C_RegDef_t* ) _MMIO_ADDR_I2C3)
+#define STM32F4XX_I2C3_REG   ((STM32F4xx_I2C_RegDef_t* ) _MMIO_ADDR_I2C3)
 
 #define _MMIO_ADDR_USART1   0x40011000UL
 #define _MMIO_ADDR_USART2   0x40004400UL
