@@ -243,27 +243,321 @@ typedef struct
 
 #define _MMIO_ADDR_RTC      0x40002800UL 
 
+typedef union __STM32F4xx_RTC_TR_Regdef
+{
+    struct
+    {
+        const uint32_t _reserved_1      :   8;  // Byte 3, Bit 0-7 | 24-31
+        volatile uint32_t HU            :   4;  // Byte 2, Bit 0-3 | 16-19
+        volatile uint32_t HT            :   2;  // Byte 2, Bit 4-5 | 20-21
+        volatile uint32_t PM            :   1;  // Byte 2, Bit   6 |    22
+        const uint32_t _reserved_2      :   1;  // Byte 2, Bit   7 |    23
+        volatile uint32_t MNU           :   4;  // Byte 1, Bit 0-3 |  8-11
+        volatile uint32_t MNT           :   3;  // Byte 1, Bit 4-6 | 12-14
+        const uint32_t _reserved_3      :   1;  // Byte 1, Bit   7 |    15
+        volatile uint32_t SUB           :   4;  // Byte 0, Bit 0-3 |  0- 3
+        volatile uint32_t ST            :   3;  // Byte 0, Bit 4-6 |  4- 6
+        const uint32_t _reserved_4      :   1;  // Byte 0, Bit   7 |     7
+    };
+    uint32_t raw;
+} STM32F4xx_RTC_TR_Regdef_t;
+
+typedef union __STM32F4xx_RTC_DR_Regdef
+{
+    struct
+    {
+        const uint32_t _reserved_1      :   8;  // Byte 3, Bit 0-7 | 24-31
+        volatile uint32_t YU            :   4;  // Byte 2, Bit 0-3 | 16-19
+        volatile uint32_t YT            :   4;  // Byte 2, Bit 4-7 | 20-23
+        volatile uint32_t MU            :   4;  // Byte 1, Bit 0-3 |  8-11
+        volatile uint32_t MN            :   1;  // Byte 1, Bit   6 |    12
+        volatile uint32_t WDU           :   3;  // Byte 1, Bit   7 | 13-15
+        volatile uint32_t DU            :   4;  // Byte 0, Bit 0-3 |  0- 3
+        volatile uint32_t DT            :   2;  // Byte 0, Bit 4-5 |  4- 5
+        const uint32_t _reserved_2      :   2;  // Byte 0, Bit 6-7 |  6- 7
+    };
+    uint32_t raw;
+} STM32F4xx_RTC_DR_Regdef_t;
+
+typedef union __STM32F4xx_RTC_CR_Regdef
+{
+    struct
+    {
+        const uint32_t _reserved_1      :   8;  // Byte 3, Bit 0-7 | 24-31
+        volatile uint32_t ADD1H         :   1;  // Byte 2, Bit   0 |    16
+        volatile uint32_t SUB1H         :   1;  // Byte 2, Bit   1 |    17
+        volatile uint32_t BKP           :   1;  // Byte 2, Bit   2 |    18
+        volatile uint32_t COSEL         :   1;  // Byte 2, Bit   3 |    19
+        volatile uint32_t POL           :   1;  // Byte 2, Bit   4 |    20
+        volatile uint32_t OSEL          :   2;  // Byte 2, Bit 5-6 | 21-22
+        volatile uint32_t COE           :   1;  // Byte 2, Bit   7 |    23
+        volatile uint32_t ALRAE         :   1;  // Byte 1, Bit   0 |     8
+        volatile uint32_t ALRBE         :   1;  // Byte 1, Bit   1 |     9
+        volatile uint32_t WUT           :   1;  // Byte 1, Bit   2 |    10
+        volatile uint32_t TSE           :   1;  // Byte 1, Bit   3 |    11
+        volatile uint32_t ALRAIE        :   1;  // Byte 1, Bit   4 |    12
+        volatile uint32_t ALRBIE        :   1;  // Byte 1, Bit   5 |    13
+        volatile uint32_t WUTIE         :   1;  // Byte 1, Bit   6 |    14
+        volatile uint32_t TSIE          :   1;  // Byte 1, Bit   7 |    15
+        volatile uint32_t WUCKSEL       :   3;  // Byte 0, Bit 0-2 |  0- 2
+        volatile uint32_t TSEDGE        :   1;  // Byte 0, Bit   3 |     3
+        volatile uint32_t REFCKON       :   1;  // Byte 0, Bit   4 |     4
+        volatile uint32_t BYPASHAD      :   1;  // Byte 0, Bit   5 |     5
+        volatile uint32_t FMT           :   1;  // Byte 0, Bit   6 |     6
+        volatile uint32_t DCE           :   1;  // Byte 0, Bit   7 |     7
+    };
+    uint32_t raw;
+} STM32F4xx_RTC_CR_Regdef_t;
+
+typedef union __STM32F4xx_RTC_ISR_Regdef
+{
+    struct
+    {
+        const uint32_t _reserved_1      :   8;  // Byte 3, Bit 0-7 | 24-31
+        volatile uint32_t RECALPF       :   1;  // Byte 2, Bit   0 |    16
+        const uint32_t _reserved_2      :   7;  // Byte 3, Bit 0-7 | 17-23
+        volatile uint32_t ALRAF         :   1;  // Byte 1, Bit   0 |     8
+        volatile uint32_t ALRBF         :   1;  // Byte 1, Bit   1 |     9
+        volatile uint32_t WUTF          :   1;  // Byte 1, Bit   2 |    10
+        volatile uint32_t TSF           :   1;  // Byte 1, Bit   3 |    11
+        volatile uint32_t TSOVF         :   1;  // Byte 1, Bit   4 |    12
+        volatile uint32_t TAMP1F        :   1;  // Byte 1, Bit   5 |    13
+        const uint32_t _reserved_3      :   2;  // Byte 1, Bit 6-7 | 14-15
+        volatile uint32_t ALRAWF        :   1;  // Byte 0, Bit   0 |     0
+        volatile uint32_t ALRBWF        :   1;  // Byte 0, Bit   1 |     1
+        volatile uint32_t WUTWF         :   1;  // Byte 0, Bit   2 |     2
+        volatile uint32_t SHPF          :   1;  // Byte 0, Bit   3 |     3
+        volatile uint32_t INITS         :   1;  // Byte 0, Bit   4 |     4
+        volatile uint32_t RSF           :   1;  // Byte 0, Bit   5 |     5
+        volatile uint32_t INITF         :   1;  // Byte 0, Bit   6 |     6
+        volatile uint32_t INIT          :   1;  // Byte 0, Bit   7 |     7
+    };
+    uint32_t raw;
+} STM32F4xx_RTC_ISR_Regdef_t;
+
+typedef union __STM32F4xx_RTC_PRER_Regdef
+{
+    struct
+    {
+        const uint32_t _reserved_1      :   8;  // Byte 3, Bit 0-7 | 24-31
+        volatile uint32_t PREDIV_A      :   8;  // Byte 2, Bit 0-7 | 16-23
+        volatile uint32_t PREDIV_S_H    :   7;  // Byte 1, Bit 0-6 |  7-14
+        const uint32_t _reserved_1      :   1;  // Byte 1, Bit   7 |    15
+        volatile uint32_t PREDIV_S_L    :   8;  // Byte 0, Bit 0-7 |  0- 7
+    };
+    uint32_t raw;
+} STM32F4xx_RTC_PRER_Regdef_t;
+
+typedef union __STM32F4xx_RTC_WUTR_Regdef
+{
+    struct
+    {
+        const uint32_t _reserved_1      :   8;  // Byte 3, Bit 0-7 | 24-31
+        const uint32_t _reserved_2      :   8;  // Byte 2, Bit 0-7 | 16-23
+        volatile uint32_t WUT_H         :   8;  // Byte 1, Bit 0-7 |  7-15
+        volatile uint32_t WUT_L         :   8;  // Byte 0, Bit 0-7 |  0- 7
+    };
+    uint32_t raw;
+} STM32F4xx_RTC_WUTR_Regdef_t;
+
+typedef union __STM32F4xx_RTC_CALIBR_Regdef
+{
+    struct
+    {
+        const uint32_t _reserved_1      :   8;  // Byte 3, Bit 0-7 | 24-31
+        const uint32_t _reserved_2      :   8;  // Byte 2, Bit 0-7 | 16-23
+        const uint32_t _reserved_3      :   8;  // Byte 1, Bit 0-7 |  7-15
+        volatile uint32_t DC            :   5;  // Byte 0, Bit 0-4 |  0- 4
+        const uint32_t _reserved_4      :   2;  // Byte 0, Bit 5-6 |  5- 6
+        volatile uint32_t DCS           :   1;  // Byte 0, Bit   7 |     7
+    };
+    uint32_t raw;
+} STM32F4xx_RTC_CALIBR_Regdef_t;
+
+typedef union __STM32F4xx_RTC_ARLMxR_Regdef
+{
+    struct
+    {
+        volatile uint32_t MSK4          :   1;  // Byte 3, Bit   0 |    24
+        volatile uint32_t WDSEL         :   1;  // Byte 3, Bit   1 |    25
+        volatile uint32_t DT            :   2;  // Byte 3, Bit 2-3 | 26-27
+        volatile uint32_t DU            :   4;  // Byte 3, Bit 4-7 | 28-31
+        
+        volatile uint32_t HU            :   4;  // Byte 2, Bit 0-3 | 16-19
+        volatile uint32_t HT            :   2;  // Byte 2, Bit 4-5 | 20-21
+        volatile uint32_t PM            :   1;  // Byte 2, Bit   6 |    22
+        volatile uint32_t MSK3          :   1;  // Byte 2, Bit   7 |    23
+
+        volatile uint32_t MNU           :   4;  // Byte 1, Bit 0-3 |  8-11
+        volatile uint32_t MNT           :   3;  // Byte 1, Bit 4-6 | 12-14
+        volatile uint32_t MSK2          :   1;  // Byte 1, Bit   7 |    15
+
+        volatile uint32_t SU            :   4;  // Byte 0, Bit 0-3 |  0- 3
+        volatile uint32_t ST            :   3;  // Byte 0, Bit 4-6 |  4- 6
+        volatile uint32_t MSK1          :   1;  // Byte 0, Bit   7 |     7
+    };
+    uint32_t raw;
+} STM32F4xx_RTC_ARLMxR_Regdef_t;
+
+typedef union __STM32F4xx_RTC_WPR_Regdef
+{
+    struct
+    {
+        const uint32_t _reserved_1      :   8;  // Byte 3, Bit 0-7 | 24-31
+        const uint32_t _reserved_2      :   8;  // Byte 2, Bit 0-7 | 16-23
+        const uint32_t _reserved_3      :   8;  // Byte 1, Bit 0-7 |  7-15
+        volatile uint32_t KEY           :   8;  // Byte 0, Bit 0-4 |  0- 7
+    };
+    uint32_t raw;
+} STM32F4xx_RTC_WPR_Regdef_t;
+
+typedef union __STM32F4xx_RTC_SSR_Regdef
+{
+    struct
+    {
+        const uint32_t _reserved_1      :   8;  // Byte 3, Bit 0-7 | 24-31
+        const uint32_t _reserved_2      :   8;  // Byte 2, Bit 0-7 | 16-23
+        volatile uint32_t SS_H          :   8;  // Byte 1, Bit 0-7 |  8-15
+        volatile uint32_t SS_L          :   8;  // Byte 0, Bit 0-4 |  0- 7
+    };
+    uint32_t raw;
+} STM32F4xx_RTC_SSR_Regdef_t;
+
+typedef union __STM32F4xx_RTC_RTC_SHIFTR_Regdef
+{
+    struct
+    {
+        const uint32_t _reserved_1      :   7;  // Byte 3, Bit 0-6 | 24-30
+        volatile uint32_t ADD1S         :   1;  // Byte 0, Bit   7 |    31
+        const uint32_t _reserved_2      :   8;  // Byte 2, Bit 0-7 | 16-23
+        volatile uint32_t SUBFS_H       :   7;  // Byte 1, Bit 0-6 |  7-14
+        const uint32_t _reserved_3      :   1;  // Byte 0, Bit   7 |    15
+        volatile uint32_t SUBFS_L       :   8;  // Byte 0, Bit 0-7 |  0- 7
+    };
+    uint32_t raw;
+} STM32F4xx_RTC_RTC_SHIFTR_Regdef_t;
+
+typedef union __STM32F4xx_RTC_TSTR_Regdef
+{
+    struct
+    {
+        const uint32_t _reserved_1      :   8;  // Byte 3, Bit 0-7 | 24-31
+        
+        volatile uint32_t HU            :   4;  // Byte 2, Bit 0-3 | 16-19
+        volatile uint32_t HT            :   2;  // Byte 2, Bit 4-5 | 20-21
+        volatile uint32_t PM            :   1;  // Byte 2, Bit   6 |    22
+        const uint32_t _reserved_2      :   1;  // Byte 2, Bit   7 |    23
+
+        volatile uint32_t MNU           :   4;  // Byte 1, Bit 0-3 |  8-11
+        volatile uint32_t MNT           :   3;  // Byte 1, Bit 4-6 | 12-14
+        const uint32_t _reserved_3      :   1;  // Byte 1, Bit   7 |    15
+
+        volatile uint32_t SU            :   4;  // Byte 0, Bit 0-3 |  0- 3
+        volatile uint32_t ST            :   3;  // Byte 0, Bit 4-6 |  4- 6
+        const uint32_t _reserved_4      :   1;  // Byte 0, Bit   7 |     7
+    };
+    uint32_t raw;
+} STM32F4xx_RTC_TSTR_Regdef_t;
+
+
+typedef union __STM32F4xx_RTC_TSDR_Regdef
+{
+    struct
+    {
+        const uint32_t _reserved_1      :   8;  // Byte 3, Bit 0-7 | 24-31
+        const uint32_t _reserved_2      :   8;  // Byte 2, Bit 0-3 | 16-23
+        volatile uint32_t MU            :   4;  // Byte 1, Bit 0-3 |  8-11
+        volatile uint32_t MT            :   1;  // Byte 1, Bit   6 |    12
+        volatile uint32_t WDU           :   3;  // Byte 1, Bit   7 | 13-15
+        volatile uint32_t DU            :   4;  // Byte 0, Bit 0-3 |  0- 3
+        volatile uint32_t DT            :   2;  // Byte 0, Bit 4-5 |  4- 5
+        const uint32_t _reserved_3      :   2;  // Byte 0, Bit 6-7 |  6- 7
+    };
+    uint32_t raw;
+} STM32F4xx_RTC_TSDR_Regdef_t;
+
+
+typedef union __STM32F4xx_RTC_CALR_Regdef
+{
+    struct
+    {
+        const uint32_t _reserved_1      :   8;  // Byte 3, Bit 0-7 | 24-31
+        const uint32_t _reserved_2      :   8;  // Byte 2, Bit 0-7 | 16-23
+        volatile uint32_t CALM_H        :   1;  // Byte 1, Bit   0 |     8
+        const uint32_t _reserved_3      :   4;  // Byte 1, Bit 1-4 |  9-12
+        volatile uint32_t CALW16        :   1;  // Byte 1, Bit   5 |    13
+        volatile uint32_t CALW8         :   1;  // Byte 1, Bit   6 |    14
+        volatile uint32_t CALP          :   1;  // Byte 1, Bit   7 |    15
+        volatile uint32_t CALM_L        :   8;  // Byte 0, Bit 0-7 |  0- 7
+    };
+    uint32_t raw;
+} STM32F4xx_RTC_CALR_Regdef_t;
+
+typedef union __STM32F4xx_RTC_TAFCR_Regdef
+{
+    struct
+    {
+        const uint32_t _reserved_1      :   8;  // Byte 3, Bit 0-7 | 24-31
+        
+        volatile uint32_t TAMP1INSEL    :   1;  // Byte 2, Bit   0 |    16
+        volatile uint32_t TSINSEL       :   1;  // Byte 2, Bit   1 |    17
+        volatile uint32_t ALARMOUTTYPE  :   1;  // Byte 2, Bit   2 |    18
+        const uint32_t _reserved_2      :   5;  // Byte 2, Bit   7 | 19-23
+
+        volatile uint32_t TAMPFREQ      :   3;  // Byte 1, Bit 0-2 |  8-10
+        volatile uint32_t TAMPFLT       :   2;  // Byte 1, Bit 3-4 | 11-12
+        volatile uint32_t TAMPPRCH      :   2;  // Byte 1, Bit 5-6 | 13-14
+        volatile uint32_t TAMPPUDIS     :   1;  // Byte 1, Bit   7 |    15
+
+        volatile uint32_t TAMP1E        :   1;  // Byte 0, Bit   0 |     0
+        volatile uint32_t TAMP1TRG      :   1;  // Byte 0, Bit   1 |     1
+        volatile uint32_t TAMPIE        :   1;  // Byte 0, Bit   2 |     2
+        const uint32_t _reserved_3      :   4;  // Byte 0, Bit 3-6 |  3- 6
+        volatile uint32_t TAMPTS        :   1;  // Byte 0, Bit   7 |     7
+    };
+    uint32_t raw;
+} STM32F4xx_RTC_TAFCR_Regdef_t;
+
+typedef union __STM32F4xx_RTC_ALRMxSSR_Regdef
+{
+    struct
+    {
+        volatile uint32_t MASKSS        :   4;  // Byte 3, Bit 0-3 | 24-37
+        const uint32_t _reserved_1      :   4;  // Byte 3, Bit 4-7 | 28-31
+
+        const uint32_t _reserved_2      :   8;  // Byte 2, Bit 0-7 | 16-23
+
+        volatile uint32_t SS_H          :   7;  // Byte 1, Bit 0-6 |  8-14
+        const uint32_t _reserved_3      :   1;  // Byte 1, Bit   7 |    15
+
+        volatile uint32_t SS_L          :   8;  // Byte 0, Bit 0-4 |  0- 7
+    };
+    uint32_t raw;
+} STM32F4xx_RTC_ALRMxSSR_Regdef_t;
+
 typedef struct
 {
-    volatile uint32_t RTC_TR;       // 0x00 RTC time register
-    volatile uint32_t RTC_DR;       // 0x04 RTC date register
-    volatile uint32_t RTC_CR;       // 0x08 RTC control register
-    volatile uint32_t RTC_ISR;      // 0x0C RTC initialization and status register
-    volatile uint32_t RTC_PRER;     // 0x10 RTC prescaler register 
-    volatile uint32_t RTC_WUTR;     // 0x14 RTC wakeup timer register 
-    volatile uint32_t RTC_CALIBR;   // 0x18 RTC calibration register
-    volatile uint32_t RTC_ALRMAR;   // 0x1C RTC alarm A register
-    volatile uint32_t RTC_ALRMBR;   // 0x20 RTC alarm B register
-    volatile uint32_t RTC_WPR;      // 0x24 RTC write protection register
-    volatile uint32_t RTC_SSR;      // 0x28 RTC sub second register
-    volatile uint32_t RTC_SHIFTR;   // 0x2C RTC shift control register
-    volatile uint32_t RTC_TSTR;     // 0x30 RTC time stamp time register
-    volatile uint32_t RTC_TSSSR;    // 0x34 RTC time stamp date register 
-    volatile uint32_t RTC_CALR;     // 0x38 RTC timestamp sub second register 
-    volatile uint32_t RTC_TAFCR;    // 0x3C RTC tamper and alternate function configuration register
-    volatile uint32_t RTC_ALRMASSR; // 0x40 RTC alarm A sub second register
-    volatile uint32_t RTC_ALRMBSSR; // 0x44 RTC alarm B sub second register 
-    volatile uint32_t RTC_BKPR[20]; // 0x48 RTC backup registers
+    volatile STM32F4xx_RTC_TR_Regdef_t RTC_TR;              // 0x00 RTC time register
+    volatile STM32F4xx_RTC_DR_Regdef_t RTC_DR;              // 0x04 RTC date register
+    volatile STM32F4xx_RTC_CR_Regdef_t RTC_CR;              // 0x08 RTC control register
+    volatile STM32F4xx_RTC_ISR_Regdef_t RTC_ISR;            // 0x0C RTC initialization and status register
+    volatile STM32F4xx_RTC_PRER_Regdef_t RTC_PRER;          // 0x10 RTC prescaler register 
+    volatile STM32F4xx_RTC_WUTR_Regdef_t RTC_WUTR;          // 0x14 RTC wakeup timer register 
+    volatile STM32F4xx_RTC_CALIBR_Regdef_t RTC_CALIBR;      // 0x18 RTC calibration register
+    volatile STM32F4xx_RTC_ARLMxR_Regdef_t RTC_ALRMAR;      // 0x1C RTC alarm A register
+    volatile STM32F4xx_RTC_ARLMxR_Regdef_t RTC_ALRMBR;      // 0x20 RTC alarm B register
+    volatile STM32F4xx_RTC_WPR_Regdef_t RTC_WPR;            // 0x24 RTC write protection register
+    volatile STM32F4xx_RTC_SSR_Regdef_t RTC_SSR;            // 0x28 RTC sub second register
+    volatile STM32F4xx_RTC_RTC_SHIFTR_Regdef_t RTC_SHIFTR;  // 0x2C RTC shift control register
+    volatile STM32F4xx_RTC_TSTR_Regdef_t RTC_TSTR;          // 0x30 RTC time stamp time register
+    volatile STM32F4xx_RTC_TSDR_Regdef_t RTC_TSDR;          // 0x34 RTC time stamp date register 
+    volatile STM32F4xx_RTC_SSR_Regdef_t RTC_TSSSR;          // 0x38 RTC timestamp sub second register 
+    volatile STM32F4xx_RTC_CALR_Regdef_t RTC_CALR;          // 0x3C RTC calibration register
+    volatile STM32F4xx_RTC_TAFCR_Regdef_t RTC_TAFCR;        // 0x40 RTC tamper and alternate function configuration register
+    volatile STM32F4xx_RTC_ALRMxSSR_Regdef_t RTC_ALRMASSR;  // 0x44 RTC alarm A sub second register
+    volatile STM32F4xx_RTC_ALRMxSSR_Regdef_t RTC_ALRMBSSR;  // 0x48 RTC alarm B sub second register 
+    const uint32_t __reserved;                              // 0x4C reserved register
+    volatile uint32_t RTC_BKPR[20];                         // 0x50-0x9C RTC backup registers
 } STM32F4xx_RTC_RegDef_t;
 
 #define STM32F4XX_RTC_REG   ((STM32F4xx_RTC_RegDef_t* ) _MMIO_ADDR_RTC)
