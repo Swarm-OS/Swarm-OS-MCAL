@@ -14,12 +14,12 @@
 #include <stdint.h>
 #include "datatypes.h"
 
-typedef struct _RTCIf_date_time
+typedef struct _RTCIf_bcd_date_time
 {
     // byte 0
     uint8_t second_tens             :   3;
     uint8_t minute_tens             :   3;
-    uint8_t date_tens               :   2;
+    uint8_t day_tens                :   2;
     // byte 1
     uint8_t second_units            :   4;
     uint8_t minute_units            :   4;    
@@ -32,17 +32,52 @@ typedef struct _RTCIf_date_time
     uint8_t month_units             :   4;
     // byte 5
     uint8_t month_tens              :   1;
-    uint8_t date_of_week            :   3;
-    uint8_t date_units              :   4;
+    uint8_t day_of_week             :   3;
+    uint8_t day_units               :   4;
     // byte 6
+    boolean is_PM; 
+} RTCIf_bcd_date_time_t;
+
+typedef struct _RTCIf_bin_date_time
+{
+    // byte 1
+    uint8_t seconds;
+    // byte 2
+    uint8_t minutes;
+    // byte 3
+    uint8_t hour                    :   5;
+    uint8_t day_of_week             :   3;
+    // byte 4
+    uint8_t day_of_month;
+    // byte 5
+    uint8_t month;
+    // byte 6
+    uint8_t year                    :   7;
     boolean is_PM                   :   1; 
+} RTCIf_bin_date_time_t;
+
+typedef enum __RTCIf_date_time_format
+{
+    RTCIF_FORMAT_BIN                = 0x00, // time and date information is in binary representation
+    RTCIF_FORMAT_BCD                = 0x01, // time and date information is in binary counted decimal representaiton
+} RTCIf_date_time_format_t;
+
+
+
+typedef struct __RTCIf_date_time
+{
+    RTCIf_date_time_format_t input_format; 
+    union {
+        RTCIf_bcd_date_time_t bcd;
+        RTCIf_bin_date_time_t bin;
+    };
 } RTCIf_date_time_t;
+
 
 typedef struct _RTCIf_handle
 {
-    boolean use_24h_mode            :   1;
-    boolean calibration_output_en   :   1;
-
+    RTCIf_date_time_t time;
+    boolean use_24h_mode;
 } RTCIf_handle_t;
 
 typedef struct _RTCIf_alarm_handle
@@ -50,7 +85,6 @@ typedef struct _RTCIf_alarm_handle
     void *callback;                         // function to be called when alarm rings
     RTCIf_date_time_t alarm;                // time when the alarm shall rang
     RTCIf_date_time_t interval;             // intervall of the alarm
-    identifier_t alarm_id;                          // alarm id
 } RTCIf_alarm_handle_t;
 
 /**
@@ -86,7 +120,7 @@ std_return_type_t RTCIf_deinit();
  *                                    RTC, the function returns E_NOT_SUPPORTED 
  *                                    Else it returns E_OK.
  */
-std_return_type_t RTCIf_config(RTCIf_handle_t cfg);
+std_return_type_t RTCIf_config(RTCIf_handle_t *cfg);
 
 /**
  * @brief Updates RTC time
@@ -98,7 +132,7 @@ std_return_type_t RTCIf_config(RTCIf_handle_t cfg);
  *                                    function returns E_NOT_EXISTING. 
  *                                    Else it returns E_OK.
  */
-std_return_type_t RTCIf_set_time(RTCIf_date_time_t time);
+std_return_type_t RTCIf_set_time(RTCIf_date_time_t *time);
 
 /**
  * @brief Updates RTC date
@@ -110,7 +144,7 @@ std_return_type_t RTCIf_set_time(RTCIf_date_time_t time);
  *                                    function returns E_NOT_EXISTING. 
  *                                    Else it returns E_OK.
  */
-std_return_type_t RTCIf_set_date(RTCIf_date_time_t date);
+std_return_type_t RTCIf_set_date(RTCIf_date_time_t *date);
 
 /**
  * @brief Updates RTC date and time
@@ -122,7 +156,7 @@ std_return_type_t RTCIf_set_date(RTCIf_date_time_t date);
  *                                    function returns E_NOT_EXISTING. 
  *                                    Else it returns E_OK.
  */
-std_return_type_t RTCIf_set_date_time(RTCIf_date_time_t date_time);
+std_return_type_t RTCIf_set_date_time(RTCIf_date_time_t *date_time);
 
 /**
  * @brief Get current date and time
@@ -137,20 +171,32 @@ std_return_type_t RTCIf_set_date_time(RTCIf_date_time_t date_time);
 std_return_type_t RTCIf_get_date_time(RTCIf_date_time_t *date_time);
 
 /**
- * @brief Get current date and time
+ * @brief Set alarm
  *  
- * This function returns the current date and time of the MCUs RTC
+ * This sets a alarm of the MCUs RTC
  * 
- * @param  RTCIf_alarm_handle_t *alarm: Alarm configuration
- * @return std_return_type_t status : If the MCU does not have a RTC or 
- *                                    the alarm does not exist the  
- *                                    function returns E_NOT_EXISTING. 
- *                                    If the provided callback function
- *                                    is a NULL the function returns
- *                                    E_VALUE_NULL. 
- *                                    Else it returns E_OK.
+ * @param  identifier_t alarm_id        : ID of the alarm
+ * @param  RTCIf_alarm_handle_t *alarm  : Alarm configuration
+ * @return std_return_type_t status     : If the MCU does not have a RTC or 
+ *                                        the alarm does not exist the  
+ *                                        function returns E_NOT_EXISTING. 
+ *                                        If the provided callback function
+ *                                        is a NULL the function returns
+ *                                        E_VALUE_NULL. Else it returns E_OK.
  */
-std_return_type_t RTCIf_set_alarm(RTCIf_alarm_handle_t *alarm);
+std_return_type_t RTCIf_set_alarm(identifier_t alarm_id, RTCIf_alarm_handle_t *alarm);
 
+/**
+ * @brief Clear alarm
+ *  
+ * This disables a alarm of the MCUs RTC
+ * 
+ * @param  identifier_t alarm_id        : ID of the alarm
+ * @return std_return_type_t status     : If the MCU does not have a RTC or 
+ *                                        the alarm does not exist the  
+ *                                        function returns E_NOT_EXISTING. 
+ *                                        Else it returns E_OK.
+ */
+std_return_type_t RTCIf_clear_alarm(identifier_t alarm_id);
 
 #endif
