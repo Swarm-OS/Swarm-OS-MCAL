@@ -620,7 +620,7 @@ typedef union __STM32F4xx_I2C_CR2_Regdef
         volatile uint16_t LAST          :   1;  // Byte 1, Bit 4   | 12
         const uint16_t _reserved_1      :   3;  // Byte 1, Bit 5-7 | 13-15
         volatile uint16_t FREQ          :   6;  // Byte 0, Bit 0-5 |  0-5
-        const uint16_t _reserved_1      :   2;  // Byte 0, Bit 6-7 |  6-7
+        const uint16_t _reserved_2      :   2;  // Byte 0, Bit 6-7 |  6-7
     };
     uint16_t raw;
 } STM32F4xx_I2C_CR2_Regdef_t;
@@ -709,7 +709,7 @@ typedef union __STM32F4xx_I2C_CCR_Regdef
     {
         volatile uint16_t CCR_H         :   4;  // Byte 1, Bit 0-3 |  8-11
         const uint16_t __reserved       :   2;  // Byte 1, Bit 4-5 |  12-13
-        volatile uint16_t CDUTY         :   1;  // Byte 1, Bit 6   |  14
+        volatile uint16_t DUTY          :   1;  // Byte 1, Bit 6   |  14
         volatile uint16_t FS            :   1;  // Byte 1, Bit 7   |  15
         volatile uint16_t CCR_L         :   8;  // Byte 0, Bit 0-7 |  0-7
     };
