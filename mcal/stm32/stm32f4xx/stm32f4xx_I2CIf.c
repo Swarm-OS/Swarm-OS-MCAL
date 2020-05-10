@@ -14,9 +14,9 @@
 #include "I2CIf.h"
 #include "SysClockIf.h"
 
-const char parent_clock[] = "APB1";
+char parent_clock[] = "APB1";
 
-static std_return_type_t stm32f4xx_I2CIf_config_master(identifier_t i2c_bus_id, I2CIf_handle_t *bus_cfg);
+static std_return_type_t stm32f4xx_I2CIf_config_master(identifier_t i2c_bus_id, I2CIf_master_config *master_cfg);
 static std_return_type_t stm32f4xx_I2CIf_config_slave(identifier_t i2c_bus_id, I2CIf_slave_cfg_t *slave_cfg);
 
 typedef struct _stm32f4xx_I2C_config
@@ -131,10 +131,9 @@ std_return_type_t I2CIf_config(identifier_t i2c_bus_id, I2CIf_handle_t *bus_cfg)
     return E_OK;
 }
 
-static std_return_type_t stm32f4xx_I2CIf_config_master(identifier_t i2c_bus_id, I2CIf_handle_t *bus_cfg)
+static std_return_type_t stm32f4xx_I2CIf_config_master(identifier_t i2c_bus_id, I2CIf_master_config *master_cfg)
 {
-    I2CIf_master_config *master_cfg = bus_cfg->master_cfg;
-    identifier_t clock_id = SysClockIf_get_clock_id(&parent_clock);
+    identifier_t clock_id = SysClockIf_get_clock_id(parent_clock);
     uint32_t input_clock_frequeny = SysClockIf_get_clock_frequency(clock_id);
     STM32F4xx_I2C_RegDef_t *i2c_registers;
 

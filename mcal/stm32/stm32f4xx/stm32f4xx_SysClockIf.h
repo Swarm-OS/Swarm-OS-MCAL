@@ -144,4 +144,6 @@ SystemClock_clock_t sys_clock_config[] =
 };
 #endif
 
+#define SYSCLOCK_ENTRIES (sizeof(sys_clock_config)/sizeof(SystemClock_clock_t))
+
 #endif
