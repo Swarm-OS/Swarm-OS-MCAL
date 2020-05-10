@@ -29,9 +29,45 @@ static void stm32f4xx_RTCIf_leave_init_mode(void);
 static void stm32f4xx_RTCIf_bin2bcd(RTCIf_date_time_t *original, RTCIf_date_time_t *converted);
 static void stm32f4xx_RTCIf_bcd2bin(RTCIf_date_time_t *original, RTCIf_date_time_t *converted);
 static void stm32f4xx_RTCIf_set_date_time(RTCIf_date_time_t *date_time, stm32f4xx_RTCIf_date_time_format_t flags);
+static void stm32f4xx_RTCIf_get_date_time(RTCIf_date_time_t *date_time);
 
 std_return_type_t RTCIf_init()
 {
+    stm32f4xx_RTCIf_disable_write_protection();
+    std_return_type_t status = stm32f4xx_RTCIf_enter_init_mode();
+
+    if(status == E_OK)
+    {
+        // calculate asynchronous and synchronous prescaler values
+        identifier_t rtc_clock = SysClockIf_get_clock_id("RTC Clock Source");
+        uint32_t rtc_input_frequency = SysClockIf_get_clock_frequency(rtc_clock);
+        
+        // asynchronous shall be as large as possible
+        uint8_t prescaler_async=0;
+        // maximum asynch divisor is 128, therfore start at this value
+        for(prescaler_async = 128; prescaler_async >1;prescaler_async--)
+        {
+            if(rtc_input_frequency % prescaler_async ==0)
+            {
+                break;
+            }
+        }
+        // prescaler is +1 register
+        prescaler_async--;
+        // calculate synchronous prescaler
+        uint32_t prescaler_synch = rtc_input_frequency/prescaler_async;
+        // prescaler is +1 register
+        prescaler_synch--;
+
+        // set values
+        STM32F4XX_RTC_REG->RTC_PRER.PREDIV_S_H = prescaler_synch & 0xFF;
+        prescaler_synch >>= 8;
+        STM32F4XX_RTC_REG->RTC_PRER.PREDIV_S_H = prescaler_synch & 0xFF;
+        STM32F4XX_RTC_REG->RTC_PRER.PREDIV_A = prescaler_async;
+
+        stm32f4xx_RTCIf_leave_init_mode();
+    }
+    stm32f4xx_RTCIf_enable_write_protection();
     return E_OK;
 }
 
@@ -168,7 +204,7 @@ static void stm32f4xx_RTCIf_set_date_time(RTCIf_date_time_t *date_time, stm32f4x
     {
         if(STM32F4XX_RTC_REG->RTC_CR.FMT == 1)
         {
-            if(date_time->bcd.is_PM == TRUE)
+            if(date_time->bcd.is_PM != FALSE)
             {
                 STM32F4XX_RTC_REG->RTC_TR.PM = 1;
             }
@@ -208,7 +244,46 @@ static void stm32f4xx_RTCIf_set_date_time(RTCIf_date_time_t *date_time, stm32f4x
         STM32F4XX_RTC_REG->RTC_DR.WDU = date_time->bcd.day_of_week;
     }
 }
+static void stm32f4xx_RTCIf_get_date_time(RTCIf_date_time_t *date_time)
+{
+    if(STM32F4XX_RTC_REG->RTC_CR.FMT == 1)
+    {
+        if(STM32F4XX_RTC_REG->RTC_TR.PM == 1)
+        {
+            date_time->bcd.is_PM = TRUE;
+        }
+        else
+        {
+            date_time->bcd.is_PM = FALSE;
+        }
+    }
+    // get seconds
+    date_time->bcd.second_tens=STM32F4XX_RTC_REG->RTC_TR.ST;
+    date_time->bcd.second_units=STM32F4XX_RTC_REG->RTC_TR.SU;
 
+    // get minuts
+    date_time->bcd.minute_tens = STM32F4XX_RTC_REG->RTC_TR.MNT;
+    date_time->bcd.minute_units = STM32F4XX_RTC_REG->RTC_TR.MNU;
+
+    // get hours
+    date_time->bcd.hour_tens = STM32F4XX_RTC_REG->RTC_TR.HT;
+    date_time->bcd.hour_units = STM32F4XX_RTC_REG->RTC_TR.HU;
+
+    // get day of month
+    date_time->bcd.day_tens = STM32F4XX_RTC_REG->RTC_DR.DT;
+    date_time->bcd.day_units = STM32F4XX_RTC_REG->RTC_DR.DU;
+
+    // get month
+    date_time->bcd.month_tens = STM32F4XX_RTC_REG->RTC_DR.MT;
+    date_time->bcd.month_units = STM32F4XX_RTC_REG->RTC_DR.MU;
+
+    // get year
+    date_time->bcd.year_tens = STM32F4XX_RTC_REG->RTC_DR.YT;
+    date_time->bcd.year_units = STM32F4XX_RTC_REG->RTC_DR.YU;
+
+    // get day of week
+    date_time->bcd.day_of_week = STM32F4XX_RTC_REG->RTC_DR.WDU;
+}
 
 std_return_type_t RTCIf_config(RTCIf_handle_t *cfg)
 {
@@ -217,7 +292,7 @@ std_return_type_t RTCIf_config(RTCIf_handle_t *cfg)
 
     if(status == E_OK)
     {
-        if(cfg->use_24h_mode == TRUE)
+        if(cfg->use_24h_mode != FALSE)
         {
             // use 24 hour mode
             STM32F4XX_RTC_REG->RTC_CR.FMT = 0;
@@ -227,32 +302,6 @@ std_return_type_t RTCIf_config(RTCIf_handle_t *cfg)
             // use AM/PM mode
             STM32F4XX_RTC_REG->RTC_CR.FMT = 1;
         }
-        
-        // calculate asynchronous and synchronous prescaler values
-        identifier_t rtc_clock = SysClockIf_get_clock_id("RTC Clock Source");
-        uint32_t rtc_input_frequency = SysClockIf_get_clock_frequency(rtc_clock);
-        
-        // asynchronous shall be as large as possible
-        uint8_t prescaler_async=0;
-        for(prescaler_async = 128; prescaler_async >1;prescaler_async--)
-        {
-            if(rtc_input_frequency % prescaler_async ==0)
-            {
-                break;
-            }
-        }
-        // prescaler is +1 register
-        prescaler_async--;
-        // calculate synchronous prescaler
-        uint32_t prescaler_synch = rtc_input_frequency/prescaler_async;
-        // prescaler is +1 register
-        prescaler_synch--;
-
-        // set values
-        STM32F4XX_RTC_REG->RTC_PRER.PREDIV_S_H = prescaler_synch & 0xFF;
-        prescaler_synch >>= 8;
-        STM32F4XX_RTC_REG->RTC_PRER.PREDIV_S_H = prescaler_synch & 0xFF;
-        STM32F4XX_RTC_REG->RTC_PRER.PREDIV_A = prescaler_async;
 
         // set time and day
         stm32f4xx_RTCIf_set_date_time(&(cfg->time), STM32F4XX_RTCIF_SET_TIME |STM32F4XX_RTCIF_SET_DATE);
@@ -311,7 +360,20 @@ std_return_type_t RTCIf_set_date_time(RTCIf_date_time_t *date_time)
 
 std_return_type_t RTCIf_get_date_time(RTCIf_date_time_t *date_time)
 {
-    return E_NOT_IMPLEMENTED;
+    if(date_time->input_format == RTCIF_FORMAT_BCD)
+    {
+        // RTC stores date time alreay in BCD format
+        stm32f4xx_RTCIf_get_date_time(date_time);
+    }
+    else
+    {
+        // use temporare variable before converting bcd to binary 
+        RTCIf_date_time_t temp_date_time;
+        stm32f4xx_RTCIf_get_date_time(&temp_date_time);
+        stm32f4xx_RTCIf_bcd2bin(&temp_date_time, date_time);
+    }
+    
+    return E_OK;
 }
 
 
