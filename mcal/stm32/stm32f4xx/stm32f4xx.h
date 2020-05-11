@@ -294,22 +294,22 @@ typedef union __STM32F4xx_I2C_CR1_Regdef
 {
     struct
     {
-        volatile uint16_t START         :   1;  // Byte 1, Bit 0 |  8
-        volatile uint16_t STOP          :   1;  // Byte 1, Bit 1 |  9
-        volatile uint16_t ACK           :   1;  // Byte 1, Bit 2 | 10
-        volatile uint16_t POS           :   1;  // Byte 1, Bit 3 | 11
-        volatile uint16_t PEC           :   1;  // Byte 1, Bit 4 | 12
-        volatile uint16_t ALERT         :   1;  // Byte 1, Bit 5 | 13
-        const uint16_t _reserved_1      :   1;  // Byte 1, Bit 6 | 14
-        volatile uint16_t SWRST         :   1;  // Byte 1, Bit 7 | 15
-        volatile uint16_t PE            :   1;  // Byte 0, Bit 0 |  0
-        volatile uint16_t SMBUS         :   1;  // Byte 0, Bit 1 |  1
-        const uint16_t _reserved_2      :   1;  // Byte 0, Bit 2 |  2
-        volatile uint16_t SMBTYPE       :   1;  // Byte 0, Bit 3 |  3
-        volatile uint16_t ENARP         :   1;  // Byte 0, Bit 4 |  4
-        volatile uint16_t ENPEC         :   1;  // Byte 0, Bit 5 |  5
-        volatile uint16_t ENGC          :   1;  // Byte 0, Bit 6 |  6
-        volatile uint16_t NOSTRETCH     :   1;  // Byte 0, Bit 7 |  7
+        volatile uint16_t PE            :   1;  // Bit  0
+        volatile uint16_t SMBUS         :   1;  // Bit  1
+        const uint16_t _reserved_2      :   1;  // Bit  2
+        volatile uint16_t SMBTYPE       :   1;  // Bit  3
+        volatile uint16_t ENARP         :   1;  // Bit  4
+        volatile uint16_t ENPEC         :   1;  // Bit  5
+        volatile uint16_t ENGC          :   1;  // Bit  6
+        volatile uint16_t NOSTRETCH     :   1;  // Bit  7
+        volatile uint16_t START         :   1;  // Bit  8
+        volatile uint16_t STOP          :   1;  // Bit  9
+        volatile uint16_t ACK           :   1;  // Bit 10
+        volatile uint16_t POS           :   1;  // Bit 11
+        volatile uint16_t PEC           :   1;  // Bit 12
+        volatile uint16_t ALERT         :   1;  // Bit 13
+        const uint16_t _reserved_1      :   1;  // Bit 14
+        volatile uint16_t SWRST         :   1;  // Bit 15
     };
     uint16_t raw;
 } STM32F4xx_I2C_CR1_Regdef_t;
@@ -318,14 +318,14 @@ typedef union __STM32F4xx_I2C_CR2_Regdef
 {
     struct
     {
-        volatile uint16_t ITERREN       :   1;  // Byte 1, Bit 0   |  8
-        volatile uint16_t ITEVTEN       :   1;  // Byte 1, Bit 1   |  9
-        volatile uint16_t ITBUFEN       :   1;  // Byte 1, Bit 2   | 10
-        volatile uint16_t DMAEN         :   1;  // Byte 1, Bit 3   | 11
-        volatile uint16_t LAST          :   1;  // Byte 1, Bit 4   | 12
-        const uint16_t _reserved_1      :   3;  // Byte 1, Bit 5-7 | 13-15
-        volatile uint16_t FREQ          :   6;  // Byte 0, Bit 0-5 |  0-5
-        const uint16_t _reserved_2      :   2;  // Byte 0, Bit 6-7 |  6-7
+        volatile uint16_t FREQ          :   6;  // Byte 0, Bit  0- 5
+        const uint16_t _reserved_2      :   2;  // Byte 0, Bit  6- 7
+        volatile uint16_t ITERREN       :   1;  // Byte 1, Bit     8
+        volatile uint16_t ITEVTEN       :   1;  // Byte 1, Bit     9
+        volatile uint16_t ITBUFEN       :   1;  // Byte 1, Bit    10
+        volatile uint16_t DMAEN         :   1;  // Byte 1, Bit    11
+        volatile uint16_t LAST          :   1;  // Byte 1, Bit    12
+        const uint16_t _reserved_1      :   3;  // Byte 1, Bit 13-15
     };
     uint16_t raw;
 } STM32F4xx_I2C_CR2_Regdef_t;
@@ -348,9 +348,9 @@ typedef union __STM32F4xx_I2C_OAR2_Regdef
 {
     struct
     {
-        const uint16_t _reserved_1      :   8;  // Byte 1, Bit 0-7 |  8-15
-        volatile uint16_t ENDUAL        :   1;  // Byte 0, Bit 0   |  0
-        volatile uint16_t ADD2          :   7;  // Byte 0, Bit 1-7 |  1-7
+        volatile uint16_t ENDUAL        :   1;  // Bit    0
+        volatile uint16_t ADD2          :   7;  // Bit 1- 7
+        const uint16_t _reserved_1      :   8;  // Bit 8-15
 
     };
     uint16_t raw;
@@ -360,8 +360,8 @@ typedef union __STM32F4xx_I2C_DR_Regdef
 {
     struct
     {
-        const uint16_t _reserved_1      :   8;  // Byte 1, Bit 0-7 |  8-15
-        volatile uint16_t DR            :   8;  // Byte 0, Bit 0-7 |  0-7
+        volatile uint16_t DR            :   8;  // Bit 0- 7
+        const uint16_t _reserved_1      :   8;  // Bit 8-15
 
     };
     uint16_t raw;
@@ -371,22 +371,22 @@ typedef union __STM32F4xx_I2C_SR1_Regdef
 {
     struct
     {
-        volatile uint16_t BERR          :   1;  // Byte 1, Bit 0 |  8
-        volatile uint16_t ARLO          :   1;  // Byte 1, Bit 1 |  9
-        volatile uint16_t AF            :   1;  // Byte 1, Bit 2 | 10
-        volatile uint16_t OVR           :   1;  // Byte 1, Bit 3 | 11
-        volatile uint16_t PEC_ERR       :   1;  // Byte 1, Bit 4 | 12
-        const uint16_t _reserved_1      :   1;  // Byte 1, Bit 5 | 13
-        volatile uint16_t TIMEOUT       :   1;  // Byte 1, Bit 6 | 14
-        volatile uint16_t SMBALER       :   1;  // Byte 1, Bit 7 | 15
-        volatile uint16_t SB            :   1;  // Byte 0, Bit 0 |  0
-        volatile uint16_t ADDR          :   1;  // Byte 0, Bit 1 |  1
-        volatile uint16_t BTF           :   1;  // Byte 0, Bit 2 |  2
-        volatile uint16_t ADD10         :   1;  // Byte 0, Bit 3 |  3
-        volatile uint16_t STOPF         :   1;  // Byte 0, Bit 4 |  4
-        const uint16_t __reserved_2     :   1;  // Byte 0, Bit 5 |  5
-        volatile uint16_t RxNE          :   1;  // Byte 0, Bit 6 |  6
-        volatile uint16_t TxE           :   1;  // Byte 0, Bit 7 |  7
+        volatile uint16_t SB            :   1;  // Bit  0
+        volatile uint16_t ADDR          :   1;  // Bit  1
+        volatile uint16_t BTF           :   1;  // Bit  2
+        volatile uint16_t ADD10         :   1;  // Bit  3
+        volatile uint16_t STOPF         :   1;  // Bit  4
+        const uint16_t __reserved_2     :   1;  // Bit  5
+        volatile uint16_t RxNE          :   1;  // Bit  6
+        volatile uint16_t TxE           :   1;  // Bit  7
+        volatile uint16_t BERR          :   1;  // Bit  8
+        volatile uint16_t ARLO          :   1;  // Bit  9
+        volatile uint16_t AF            :   1;  // Bit 10
+        volatile uint16_t OVR           :   1;  // Bit 11
+        volatile uint16_t PEC_ERR       :   1;  // Bit 12
+        const uint16_t _reserved_1      :   1;  // Bit 13
+        volatile uint16_t TIMEOUT       :   1;  // Bit 14
+        volatile uint16_t SMBALER       :   1;  // Bit 15
     };
     uint16_t raw;
 } STM32F4xx_I2C_SR1_Regdef_t;
@@ -395,15 +395,15 @@ typedef union __STM32F4xx_I2C_SR2_Regdef
 {
     struct
     {
-        volatile uint16_t PEC           :   8;  // Byte 1, Bit 0-7 |  8-15
-        volatile uint16_t MSL           :   1;  // Byte 0, Bit 0   |  0
-        volatile uint16_t BUSY          :   1;  // Byte 0, Bit 1   |  1
-        volatile uint16_t TRA           :   1;  // Byte 0, Bit 2   |  2
-        const uint16_t __reserved       :   1;  // Byte 0, Bit 3   |  3
-        volatile uint16_t GENCALL       :   1;  // Byte 0, Bit 4   |  4
-        volatile uint16_t SMBDEFAULT    :   1;  // Byte 0, Bit 5   |  5
-        volatile uint16_t SMBHOST       :   1;  // Byte 0, Bit 6   |  6
-        volatile uint16_t DAUALF        :   1;  // Byte 0, Bit 7   |  7
+        volatile uint16_t MSL           :   1;  // Bit    0
+        volatile uint16_t BUSY          :   1;  // Bit    1
+        volatile uint16_t TRA           :   1;  // Bit    2
+        const uint16_t __reserved       :   1;  // Bit    3
+        volatile uint16_t GENCALL       :   1;  // Bit    4
+        volatile uint16_t SMBDEFAULT    :   1;  // Bit    5
+        volatile uint16_t SMBHOST       :   1;  // Bit    6
+        volatile uint16_t DAUALF        :   1;  // Bit    7
+        volatile uint16_t PEC           :   8;  // Bit 8-15
     };
     uint16_t raw;
 } STM32F4xx_I2C_SR2_Regdef_t;
@@ -412,11 +412,11 @@ typedef union __STM32F4xx_I2C_CCR_Regdef
 {
     struct
     {
-        volatile uint16_t CCR_H         :   4;  // Byte 1, Bit 0-3 |  8-11
-        const uint16_t __reserved       :   2;  // Byte 1, Bit 4-5 |  12-13
-        volatile uint16_t DUTY          :   1;  // Byte 1, Bit 6   |  14
-        volatile uint16_t FS            :   1;  // Byte 1, Bit 7   |  15
-        volatile uint16_t CCR_L         :   8;  // Byte 0, Bit 0-7 |  0-7
+        volatile uint16_t CCR_L         :   8;  // Bit  0- 7
+        volatile uint16_t CCR_H         :   4;  // Bit  8-11
+        const uint16_t __reserved       :   2;  // Bit 12-13
+        volatile uint16_t DUTY          :   1;  // Bit    14
+        volatile uint16_t FS            :   1;  // Bit    15
     };
     uint16_t raw;
 } STM32F4xx_I2C_CCR_Regdef_t;
@@ -425,9 +425,9 @@ typedef union __STM32F4xx_I2C_TRISE_Regdef
 {
     struct
     {
-        const uint16_t __reserved_1     :   8;  // Byte 1, Bit 0-7 |   8-15
-        volatile uint16_t TRISE         :   6;  // Byte 0, Bit 0-5 |  0-5
-        const uint16_t __reserved_2     :   2;  // Byte 0, Bit 6-7 |  6-7
+        volatile uint16_t TRISE         :   6;  // Bit 0- 5
+        const uint16_t __reserved_2     :   2;  // Bit 6- 7
+        const uint16_t __reserved_1     :   8;  // Bit 8-15
     };
     uint16_t raw;
 } STM32F4xx_I2C_TRISE_Regdef_t;
@@ -436,10 +436,10 @@ typedef union __STM32F4xx_I2C_FLTR_Regdef
 {
     struct
     {
-        const uint16_t __reserved_1     :   8;  // Byte 1, Bit 0-7 |  8-15
-        volatile uint16_t DNF           :   4;  // Byte 0, Bit 0-3 |  0-3
-        volatile uint16_t ANOFF         :   4;  // Byte 0, Bit 4   |  4
-        const uint16_t __reserved_2     :   3;  // Byte 0, Bit 5-7 |  5-7
+        volatile uint16_t DNF           :   4;  // Bit 0- 3
+        volatile uint16_t ANOFF         :   4;  // Bit    4
+        const uint16_t __reserved_2     :   3;  // Bit 5- 7
+        const uint16_t __reserved_1     :   8;  // Bit 8-15
     };
     uint16_t raw;
 } STM32F4xx_I2C_FLTR_Regdef_t;
@@ -448,15 +448,25 @@ typedef union __STM32F4xx_I2C_FLTR_Regdef
 typedef struct
 {
     volatile STM32F4xx_I2C_CR1_Regdef_t I2C_CR1;    // 0x00 I2C Control register 1
+    const uint16_t __reserved_1;                    // 0x02 reserved
     volatile STM32F4xx_I2C_CR2_Regdef_t I2C_CR2;    // 0x04 I2C Control register 2
-    volatile STM32F4xx_I2C_OAR1_Regdef_t I2C_OAR1;  // 0x08 I2C Own address register 1 
+    const uint16_t __reserved_2;                    // 0x06 reserved
+    volatile STM32F4xx_I2C_OAR1_Regdef_t I2C_OAR1;  // 0x08 I2C Own address register 1
+    const uint16_t __reserved_3;                    // 0x0A reserved 
     volatile STM32F4xx_I2C_OAR2_Regdef_t I2C_OAR2;  // 0x0C I2C Own address register 2
-    volatile STM32F4xx_I2C_DR_Regdef_t I2C_DR;      // 0x10 I2C Data register 
+    const uint16_t __reserved_4;                    // 0x0E reserved
+    volatile STM32F4xx_I2C_DR_Regdef_t I2C_DR;      // 0x10 I2C Data register
+    const uint16_t __reserved_5;                    // 0x12 reserved 
     volatile STM32F4xx_I2C_SR1_Regdef_t I2C_SR1;    // 0x14 I2C Status register 1
-    volatile STM32F4xx_I2C_SR2_Regdef_t I2C_SR2;    // 0x18 I2C Status register 2 
-    volatile STM32F4xx_I2C_CCR_Regdef_t I2C_CCR;    // 0x1C I2C Clock control register 
+    const uint16_t __reserved_6;                    // 0x16 reserved
+    volatile STM32F4xx_I2C_SR2_Regdef_t I2C_SR2;    // 0x18 I2C Status register 2
+    const uint16_t __reserved_7;                    // 0x1A reserved 
+    volatile STM32F4xx_I2C_CCR_Regdef_t I2C_CCR;    // 0x1C I2C Clock control register
+    const uint16_t __reserved_8;                    // 0x1E reserved 
     volatile STM32F4xx_I2C_TRISE_Regdef_t I2C_TRISE;// 0x20 I2C TRISE register 
+    const uint16_t __reserved_9;                    // 0x22 reserved
     volatile STM32F4xx_I2C_FLTR_Regdef_t I2C_FLTR;  // 0x24 I2C FLTR register
+    const uint16_t __reserved_10;                   // 0x26 reserved
 } STM32F4xx_I2C_RegDef_t;
 
 #define _MMIO_ADDR_I2C1     0x40005400UL
