@@ -15,6 +15,7 @@
 
 #include <stdint.h>
 #include "stm32f4xx_interrupt.h"
+#include "stm32f4xx.h"
 
 /* These are defined in the linker script */
 extern uint32_t _stext;
@@ -25,6 +26,7 @@ extern uint32_t _sdata;
 extern uint32_t _edata;
 extern uint32_t _sstack;
 extern uint32_t _estack;
+extern uint32_t _data_load;
 
 /* Forward define functions */
 int main(void);
@@ -35,7 +37,7 @@ int main(void);
 void Reset_Handler(void)
 {
     /* Copy init values from text to data */
-    uint32_t *init_values_ptr = &_etext;
+    uint32_t *init_values_ptr = &_data_load;
     uint32_t *data_ptr = &_sdata;
 
     if (init_values_ptr != data_ptr) {
