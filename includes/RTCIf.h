@@ -76,7 +76,7 @@ typedef struct __RTCIf_date_time
 
 typedef struct _RTCIf_handle
 {
-    RTCIf_date_time_t time;
+    RTCIf_date_time_t *time;
     boolean use_24h_mode;
 } RTCIf_handle_t;
 
