@@ -983,10 +983,10 @@ typedef union __STM32F4xx_RTC_ARLMxR_Regdef
         volatile uint32_t HT            :   2;  // Byte 2, Bit 4-5 | 20-21
         volatile uint32_t PM            :   1;  // Byte 2, Bit   6 |    22
         volatile uint32_t MSK3          :   1;  // Byte 2, Bit   7 |    23
-        volatile uint32_t MSK4          :   1;  // Byte 3, Bit   0 |    24
-        volatile uint32_t WDSEL         :   1;  // Byte 3, Bit   1 |    25
-        volatile uint32_t DT            :   2;  // Byte 3, Bit 2-3 | 26-27
-        volatile uint32_t DU            :   4;  // Byte 3, Bit 4-7 | 28-31
+        volatile uint32_t DT            :   2;  // Byte 3, Bit 2-3 | 24-27
+        volatile uint32_t DU            :   4;  // Byte 3, Bit 4-7 | 28-29
+        volatile uint32_t WDSEL         :   1;  // Byte 3, Bit   1 |    30
+        volatile uint32_t MSK4          :   1;  // Byte 3, Bit   0 |    31
     };
     uint32_t raw;
 } STM32F4xx_RTC_ARLMxR_Regdef_t;
