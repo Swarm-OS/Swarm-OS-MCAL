@@ -11,25 +11,35 @@
 #include <datatypes.h>
 #include <RTCIf.h>
 #include "stm32f4xx.h"
+#include "stm32f4xx_interrupt.h"
 #include <SysClockIf.h>
 
 
-typedef enum __stm32f4xx_RTCIf_date_time_format
+typedef enum __date_time_flags
 {
-    STM32F4XX_RTCIF_SET_TIME            = 0x01, // time shall be set
-    STM32F4XX_RTCIF_SET_DATE            = 0x02, // date shall be set
-} stm32f4xx_RTCIf_date_time_format_t;
+    STM32F4XX_RTCIF_TIME            = 0x01, // use time
+    STM32F4XX_RTCIF_DATE            = 0x02, // use date
+} date_time_flags_t;
 
+void (*alarm_a_callback)(RTCIf_date_time_t*);   
+RTCIf_date_time_t *alarm_a_buffer;
+void (*alarm_b_callback)(RTCIf_date_time_t*);   
+RTCIf_date_time_t *alarm_b_buffer;
 
+static void disable_write_protection(void);
+static void enable_write_protection(void);
+static std_return_type_t enter_init_mode(void);
+static void leave_init_mode(void);
 
-static void stm32f4xx_RTCIf_disable_write_protection(void);
-static void stm32f4xx_RTCIf_enable_write_protection(void);
-static std_return_type_t stm32f4xx_RTCIf_enter_init_mode(void);
-static void stm32f4xx_RTCIf_leave_init_mode(void);
-static void stm32f4xx_RTCIf_bin2bcd(RTCIf_date_time_t *original, RTCIf_date_time_t *converted);
-static void stm32f4xx_RTCIf_bcd2bin(RTCIf_date_time_t *original, RTCIf_date_time_t *converted);
-static void stm32f4xx_RTCIf_set_date_time(RTCIf_date_time_t *date_time, stm32f4xx_RTCIf_date_time_format_t flags);
-static void stm32f4xx_RTCIf_get_date_time(RTCIf_date_time_t *date_time);
+static std_return_type_t check_bin(RTCIf_bin_date_time_t *time, date_time_flags_t flags);
+static std_return_type_t check_bcd(RTCIf_bcd_date_time_t *time, date_time_flags_t flags);
+static void bin2bcd(RTCIf_date_time_t *original, RTCIf_date_time_t *converted);
+static void bcd2bin(RTCIf_date_time_t *original, RTCIf_date_time_t *converted);
+
+static void set_date_time(RTCIf_date_time_t *date_time, date_time_flags_t flags);
+static void get_date_time(RTCIf_date_time_t *date_time);
+
+static void set_alarm(RTCIf_date_time_t *date_time, volatile STM32F4xx_RTC_ARLMxR_Regdef_t *alarm_reg);
 
 std_return_type_t RTCIf_init()
 {
@@ -52,8 +62,8 @@ std_return_type_t RTCIf_init()
     // enable RTC clock
     STM32F4xx_RCC->RCC_BDCR.RTCEN = 1;
 
-    stm32f4xx_RTCIf_disable_write_protection();
-    std_return_type_t status = stm32f4xx_RTCIf_enter_init_mode();
+    disable_write_protection();
+    std_return_type_t status = enter_init_mode();
 
     if(status == E_OK)
     {
@@ -83,9 +93,10 @@ std_return_type_t RTCIf_init()
         STM32F4XX_RTC_REG->RTC_PRER.PREDIV_S = prescaler_synch;
         STM32F4XX_RTC_REG->RTC_PRER.PREDIV_A = prescaler_async;
 
-        stm32f4xx_RTCIf_leave_init_mode();
+        
+        leave_init_mode();
     }
-    stm32f4xx_RTCIf_enable_write_protection();
+    enable_write_protection();
     return E_OK;
 }
 
@@ -94,20 +105,20 @@ std_return_type_t RTCIf_deinit()
     return E_OK;
 }
 
-static void stm32f4xx_RTCIf_disable_write_protection(void)
+static void disable_write_protection(void)
 {
     STM32F4XX_RTC_REG->RTC_WPR.KEY = 0xCA;
     STM32F4XX_RTC_REG->RTC_WPR.KEY = 0x53;
     return;
 }
 
-static void stm32f4xx_RTCIf_enable_write_protection(void)
+static void enable_write_protection(void)
 {
     STM32F4XX_RTC_REG->RTC_WPR.KEY = 0xFF;
     return;
 }
 
-static std_return_type_t stm32f4xx_RTCIf_enter_init_mode(void)
+static std_return_type_t enter_init_mode(void)
 {
     STM32F4XX_RTC_REG->RTC_ISR.INIT = 1;
     for(uint32_t i=0; i<1000000;i++)
@@ -121,12 +132,106 @@ static std_return_type_t stm32f4xx_RTCIf_enter_init_mode(void)
     return E_STATE_TIMEOUT;
 }
 
-static void stm32f4xx_RTCIf_leave_init_mode(void)
+static void 
+leave_init_mode(void)
 {
     STM32F4XX_RTC_REG->RTC_ISR.INIT = 0;
 }
 
-static void stm32f4xx_RTCIf_bin2bcd(RTCIf_date_time_t *original, RTCIf_date_time_t *converted)
+static std_return_type_t check_bin(RTCIf_bin_date_time_t *time, date_time_flags_t flags)
+{
+    if(flags & STM32F4XX_RTCIF_TIME)
+    {
+        if(time->minutes >= 60 || time->seconds >= 60 ||
+           (time->uses_24h_format != FALSE && time->hour >= 24 ) ||
+           (time->uses_24h_format == FALSE && time->hour >  12 ))
+        {
+            return E_VALUE_OUT_OF_RANGE;
+        }
+    }
+
+    if(flags & STM32F4XX_RTCIF_DATE)
+    {
+        // week has 7 days, year has 12 months and max length of a month is 31 days
+        if(time->day_of_week >7 || time->month > 12 || time->day_of_month > 31)
+        {
+            return E_VALUE_OUT_OF_RANGE;
+        }
+        // february has max 29 days
+        if(time->month == 2 && time->day_of_month > 29)
+        {
+            return E_VALUE_OUT_OF_RANGE;
+        }
+        // April, June, September and November have only 30 days
+        if( (time->month == 4 || time->month == 6 || 
+             time->month == 9 || time->month == 11) &&
+            time->day_of_month > 30)   
+        {
+            return E_VALUE_OUT_OF_RANGE;
+        }
+    }
+
+    return E_OK;
+}
+
+static std_return_type_t check_bcd(RTCIf_bcd_date_time_t *time, date_time_flags_t flags)
+{
+    if(flags & STM32F4XX_RTCIF_TIME)
+    {
+        if(time->second_tens >= 6 || time->minute_tens >= 6)
+        {
+            return E_VALUE_OUT_OF_RANGE;
+        }
+
+        if(time->uses_24h_format != FALSE)
+        {
+            if(time->hour_tens > 2 || (time->hour_tens == 2 && time->hour_units >= 4))
+            {
+                return E_VALUE_OUT_OF_RANGE;
+            }
+        }
+        else
+        {
+            if(time->hour_tens > 1 || (time->hour_tens == 1 && time->hour_units > 2))
+            {
+                return E_VALUE_OUT_OF_RANGE;
+            }
+        }
+    }
+
+    if(flags & STM32F4XX_RTCIF_DATE)
+    {
+        // week has 7 days, max 12 months and max 31 days
+        if( time->day_of_week >7 || time->month_tens > 1 || 
+            (time->month_tens == 1 && time->month_units > 2) ||
+            (time->day_tens == 3 && time->month_units > 1))
+        {
+            return E_VALUE_OUT_OF_RANGE;
+        }
+        // febraury has max 29 days
+        if(time->month_tens == 0 && time->month_units == 2 && time->day_tens >= 3)
+        {
+            return E_VALUE_OUT_OF_RANGE;
+        }        
+
+        // check if month is April, June, September of November
+        if((time->month_tens == 0 && 
+            (time->month_units == 4 || time->month_units == 6|| time->month_units == 9)) ||
+           (time->month_tens == 1 && time->month_units == 1)
+        )
+        {
+            // check if day of month is the 31st
+            if(time->month_units == 3 && time->month_units == 1)
+            {
+                return E_VALUE_OUT_OF_RANGE;
+            }
+        } 
+    }
+
+    return E_OK;
+}
+
+static void bin2bcd(RTCIf_date_time_t *original, RTCIf_date_time_t *converted)
 {
     uint8_t unit=0;
     uint8_t tens=0;
@@ -151,6 +256,7 @@ static void stm32f4xx_RTCIf_bin2bcd(RTCIf_date_time_t *original, RTCIf_date_time
 
     // set am/pm 
     converted->bcd.is_PM = original->bin.is_PM;
+    converted->bcd.uses_24h_format = original->bin.uses_24h_format;
 
     // copy day of week bcd == bin in this case
     converted->bcd.day_of_week = original->bin.day_of_week;
@@ -172,9 +278,10 @@ static void stm32f4xx_RTCIf_bin2bcd(RTCIf_date_time_t *original, RTCIf_date_time
     tens = original->bin.year / 10;
     converted->bcd.year_tens = tens;
     converted->bcd.year_units = unit;
+    
 }
 
-static void stm32f4xx_RTCIf_bcd2bin(RTCIf_date_time_t *original, RTCIf_date_time_t *converted)
+static void bcd2bin(RTCIf_date_time_t *original, RTCIf_date_time_t *converted)
 {
     uint8_t temp=0;
 
@@ -208,22 +315,24 @@ static void stm32f4xx_RTCIf_bcd2bin(RTCIf_date_time_t *original, RTCIf_date_time
     temp +=original->bcd.year_units;
     converted->bin.year = temp;
 
-    // copy day of week bcd == bin in this case
+    // copy 1:1 mappings
     converted->bin.day_of_week = original->bcd.day_of_week;
+    converted->bin.uses_24h_format = original->bcd.uses_24h_format;
+    converted->bin.is_PM = original->bcd.is_PM;
 }
 
-static void stm32f4xx_RTCIf_set_date_time(RTCIf_date_time_t *date_time, stm32f4xx_RTCIf_date_time_format_t flags)
+static void set_date_time(RTCIf_date_time_t *date_time, date_time_flags_t flags)
 {
     RTCIf_date_time_t local_date_time;
     if(date_time->input_format == RTCIF_FORMAT_BIN)
     {
-        stm32f4xx_RTCIf_bin2bcd(date_time, &local_date_time);
+        bin2bcd(date_time, &local_date_time);
         date_time = &local_date_time;
     }
 
-    if(flags & STM32F4XX_RTCIF_SET_TIME)
+    if(flags & STM32F4XX_RTCIF_TIME)
     {
-        if(STM32F4XX_RTC_REG->RTC_CR.FMT == 1)
+        if(date_time->bcd.uses_24h_format == FALSE)
         {
             if(date_time->bcd.is_PM != FALSE)
             {
@@ -254,7 +363,7 @@ static void stm32f4xx_RTCIf_set_date_time(RTCIf_date_time_t *date_time, stm32f4x
         STM32F4XX_RTC_REG->RTC_TR.raw = time_reg.raw ;
     }
     
-    if(flags & STM32F4XX_RTCIF_SET_DATE)
+    if(flags & STM32F4XX_RTCIF_DATE)
     {
         // read register data
         STM32F4xx_RTC_DR_Regdef_t date_reg;
@@ -279,10 +388,11 @@ static void stm32f4xx_RTCIf_set_date_time(RTCIf_date_time_t *date_time, stm32f4x
         STM32F4XX_RTC_REG->RTC_DR.raw = date_reg.raw;
     }
 }
-static void stm32f4xx_RTCIf_get_date_time(RTCIf_date_time_t *date_time)
+static void get_date_time(RTCIf_date_time_t *date_time)
 {
     if(STM32F4XX_RTC_REG->RTC_CR.FMT == 1)
     {
+        date_time->bcd.uses_24h_format = FALSE;
         if(STM32F4XX_RTC_REG->RTC_TR.PM == 1)
         {
             date_time->bcd.is_PM = TRUE;
@@ -291,6 +401,10 @@ static void stm32f4xx_RTCIf_get_date_time(RTCIf_date_time_t *date_time)
         {
             date_time->bcd.is_PM = FALSE;
         }
+    }
+    else
+    {
+        date_time->bcd.uses_24h_format = TRUE;
     }
     // get seconds
     date_time->bcd.second_tens=STM32F4XX_RTC_REG->RTC_TR.ST;
@@ -322,8 +436,26 @@ static void stm32f4xx_RTCIf_get_date_time(RTCIf_date_time_t *date_time)
 
 std_return_type_t RTCIf_config(RTCIf_handle_t *cfg)
 {
-    stm32f4xx_RTCIf_disable_write_protection();
-    std_return_type_t status = stm32f4xx_RTCIf_enter_init_mode();
+
+    if(cfg->time->input_format == RTCIF_FORMAT_BCD)
+    {
+        std_return_type_t status = check_bcd(&cfg->time->bcd,STM32F4XX_RTCIF_TIME |STM32F4XX_RTCIF_DATE);
+        if(status != E_OK)
+        {
+            return status;
+        }
+    }
+    else
+    {
+        std_return_type_t status = check_bin(&cfg->time->bin, STM32F4XX_RTCIF_TIME |STM32F4XX_RTCIF_DATE);
+        if(status != E_OK)
+        {
+            return status;
+        }
+    }
+
+    disable_write_protection();
+    std_return_type_t status = enter_init_mode();
 
     if(status == E_OK)
     {
@@ -339,57 +471,112 @@ std_return_type_t RTCIf_config(RTCIf_handle_t *cfg)
         }
 
         // set time and day
-        stm32f4xx_RTCIf_set_date_time(cfg->time, STM32F4XX_RTCIF_SET_TIME |STM32F4XX_RTCIF_SET_DATE);
+        set_date_time(cfg->time, STM32F4XX_RTCIF_TIME |STM32F4XX_RTCIF_DATE);
 
-        stm32f4xx_RTCIf_leave_init_mode();
+        
+        leave_init_mode();
     }
-    stm32f4xx_RTCIf_enable_write_protection();
+    enable_write_protection();
 
     return status;
 }
 
 std_return_type_t RTCIf_set_time(RTCIf_date_time_t *time)
 {
-    stm32f4xx_RTCIf_disable_write_protection();
-    std_return_type_t status = stm32f4xx_RTCIf_enter_init_mode();
+    if(time->input_format == RTCIF_FORMAT_BCD)
+    {
+        std_return_type_t status = check_bcd(&time->bcd,STM32F4XX_RTCIF_TIME);
+        if(status != E_OK)
+        {
+            return status;
+        }
+    }
+    else
+    {
+        std_return_type_t status = check_bin(&time->bin, STM32F4XX_RTCIF_TIME);
+        if(status != E_OK)
+        {
+            return status;
+        }
+    }
+
+    disable_write_protection();
+    std_return_type_t status = enter_init_mode();
 
     if(status == E_OK)
     {
         // set time and day
-        stm32f4xx_RTCIf_set_date_time(time, STM32F4XX_RTCIF_SET_TIME);
-        stm32f4xx_RTCIf_leave_init_mode();
+        set_date_time(time, STM32F4XX_RTCIF_TIME);
+        
+        leave_init_mode();
     }
-    stm32f4xx_RTCIf_enable_write_protection();
+    enable_write_protection();
     return status;
 }
 
 std_return_type_t RTCIf_set_date(RTCIf_date_time_t *date)
 {
-    stm32f4xx_RTCIf_disable_write_protection();
-    std_return_type_t status = stm32f4xx_RTCIf_enter_init_mode();
+    if(date->input_format == RTCIF_FORMAT_BCD)
+    {
+        std_return_type_t status = check_bcd(&date->bcd,STM32F4XX_RTCIF_DATE);
+        if(status != E_OK)
+        {
+            return status;
+        }
+    }
+    else
+    {
+        std_return_type_t status = check_bin(&date->bin, STM32F4XX_RTCIF_DATE);
+        if(status != E_OK)
+        {
+            return status;
+        }
+    }
+
+    disable_write_protection();
+    std_return_type_t status = enter_init_mode();
 
     if(status == E_OK)
     {
         // set time and day
-        stm32f4xx_RTCIf_set_date_time(date, STM32F4XX_RTCIF_SET_DATE);
-        stm32f4xx_RTCIf_leave_init_mode();
+        set_date_time(date, STM32F4XX_RTCIF_DATE);
+        
+        leave_init_mode();
     }
-    stm32f4xx_RTCIf_enable_write_protection();
+    enable_write_protection();
     return status;
 }
 
 std_return_type_t RTCIf_set_date_time(RTCIf_date_time_t *date_time)
 {
-    stm32f4xx_RTCIf_disable_write_protection();
-    std_return_type_t status = stm32f4xx_RTCIf_enter_init_mode();
+    if(date_time->input_format == RTCIF_FORMAT_BCD)
+    {
+        std_return_type_t status = check_bcd(&date_time->bcd,STM32F4XX_RTCIF_TIME |STM32F4XX_RTCIF_DATE);
+        if(status != E_OK)
+        {
+            return status;
+        }
+    }
+    else
+    {
+        std_return_type_t status = check_bin(&date_time->bin, STM32F4XX_RTCIF_TIME |STM32F4XX_RTCIF_DATE);
+        if(status != E_OK)
+        {
+            return status;
+        }
+    }
+
+    disable_write_protection();
+    std_return_type_t status = enter_init_mode();
 
     if(status == E_OK)
     {
         // set time and day
-        stm32f4xx_RTCIf_set_date_time(date_time, STM32F4XX_RTCIF_SET_TIME |STM32F4XX_RTCIF_SET_DATE);
-        stm32f4xx_RTCIf_leave_init_mode();
+        set_date_time(date_time, STM32F4XX_RTCIF_TIME |STM32F4XX_RTCIF_DATE);
+        
+        leave_init_mode();
     }
-    stm32f4xx_RTCIf_enable_write_protection();
+    enable_write_protection();
     return status;
 }
 
@@ -398,29 +585,200 @@ std_return_type_t RTCIf_get_date_time(RTCIf_date_time_t *date_time)
     if(date_time->input_format == RTCIF_FORMAT_BCD)
     {
         // RTC stores date time alreay in BCD format
-        stm32f4xx_RTCIf_get_date_time(date_time);
+        get_date_time(date_time);
     }
     else
     {
         // use temporare variable before converting bcd to binary 
         RTCIf_date_time_t temp_date_time;
-        stm32f4xx_RTCIf_get_date_time(&temp_date_time);
-        stm32f4xx_RTCIf_bcd2bin(&temp_date_time, date_time);
+        get_date_time(&temp_date_time);
+        bcd2bin(&temp_date_time, date_time);
     }
     
     return E_OK;
 }
 
-
-std_return_type_t RTCIf_set_alarm(identifier_t alarm_id, RTCIf_alarm_handle_t *alarm)
+static void set_alarm(RTCIf_date_time_t *date_time, volatile STM32F4xx_RTC_ARLMxR_Regdef_t *alarm_reg)
 {
-    return E_NOT_IMPLEMENTED;
+    RTCIf_date_time_t local_date_time;
+    if(date_time->input_format == RTCIF_FORMAT_BIN)
+    {
+        bin2bcd(date_time, &local_date_time);
+        date_time = &local_date_time;
+    }
+
+    // read register data
+    STM32F4xx_RTC_ARLMxR_Regdef_t time_reg;
+    time_reg.raw = alarm_reg->raw;
+
+    if(date_time->bcd.uses_24h_format == FALSE)
+    {
+        if(date_time->bcd.is_PM != FALSE)
+        {
+            time_reg.PM = 1;
+        }
+        else
+        {
+            time_reg.PM = 0;
+        }
+
+    }
+    // set seconds
+    time_reg.ST = date_time->bcd.second_tens;
+    time_reg.SU = date_time->bcd.second_units;
+
+    // set minuts
+    time_reg.MNT = date_time->bcd.minute_tens;
+    time_reg.MNU = date_time->bcd.minute_units;
+
+    // set hours
+    time_reg.HT = date_time->bcd.hour_tens;
+    time_reg.HU = date_time->bcd.hour_units;
+
+    // write data back
+    alarm_reg->raw = time_reg.raw ;
+
+}
+
+std_return_type_t RTCIf_set_alarm(identifier_t alarm_id, RTCIf_alarm_handle_t *alarm_handle)
+{
+
+
+    if(alarm_handle->alarm->input_format == RTCIF_FORMAT_BCD)
+    {
+        std_return_type_t status = check_bcd(&alarm_handle->alarm->bcd,STM32F4XX_RTCIF_TIME);
+        if(status != E_OK)
+        {
+            return status;
+        }        
+        // check_bcd does not support simply checking day
+        if(alarm_handle->alarm->bcd.day_of_week>7 || alarm_handle->alarm->bcd.day_tens > 3 ||
+           (alarm_handle->alarm->bcd.day_tens == 3 && alarm_handle->alarm->bcd.day_units >1 ))
+        {
+            return E_VALUE_OUT_OF_RANGE;
+        }
+    }
+    else
+    {
+        std_return_type_t status = check_bin(&alarm_handle->alarm->bin, STM32F4XX_RTCIF_TIME);
+        if(status != E_OK)
+        {
+            return status;
+        }
+        // check_bin does not support simply checking day
+        if(alarm_handle->alarm->bin.day_of_month > 31 || alarm_handle->alarm->bin.day_of_week>7)
+        {
+            return E_VALUE_OUT_OF_RANGE;
+        }
+    }
+
+    if(alarm_id <= 0 || alarm_id > 2 )
+    {
+        return E_NOT_EXISTING;
+    }
+
+    disable_write_protection();
+    std_return_type_t status = enter_init_mode();
+    if(status == E_OK)
+    {
+        volatile STM32F4xx_RTC_ARLMxR_Regdef_t *alarm_reg;
+        if(alarm_id == 1)
+        {
+            STM32F4XX_RTC_REG->RTC_CR.ALRAE = 0;
+            STM32F4XX_RTC_REG->RTC_CR.ALRAIE = 0;
+            alarm_reg = &STM32F4XX_RTC_REG->RTC_ALRMAR;
+            alarm_a_callback = alarm_handle->callback;
+            alarm_a_buffer = alarm_handle->buffer;
+        }
+        else
+        {
+            STM32F4XX_RTC_REG->RTC_CR.ALRBE = 0;
+            STM32F4XX_RTC_REG->RTC_CR.ALRBIE = 0;
+            alarm_reg = &STM32F4XX_RTC_REG->RTC_ALRMBR;
+            alarm_b_callback = alarm_handle->callback;
+            alarm_b_buffer = alarm_handle->buffer;
+        }
+        
+        set_alarm(alarm_handle->alarm, alarm_reg);
+        alarm_reg->MSK1  = alarm_handle->flags.mask_seconds;
+        alarm_reg->MSK2  = alarm_handle->flags.mask_minutes;
+        alarm_reg->MSK3  = alarm_handle->flags.mask_hours;
+        alarm_reg->MSK4  = alarm_handle->flags.mask_date;
+        alarm_reg->WDSEL = alarm_handle->flags.use_day_of_week;
+
+        if(alarm_id == 1)
+        {
+            STM32F4XX_RTC_REG->RTC_CR.ALRAE  = 1;
+            STM32F4XX_RTC_REG->RTC_CR.ALRAIE = 1;
+        }
+        else
+        {
+            STM32F4XX_RTC_REG->RTC_CR.ALRBE  = 1;
+            STM32F4XX_RTC_REG->RTC_CR.ALRBIE = 1;
+        }
+
+        // enable interrupt flags
+        STM32F4xx_EXTI->EXTI_IMR    |=  (0x1 << 17);
+        STM32F4xx_EXTI->EXTI_RTSR   |=  (0x1 << 17);
+        stm32f4xx_enable_interrupt(STM32F4xx_EXTI17_RTC_ALARM_IRQ);
+
+        leave_init_mode();
+    }   
+    enable_write_protection();
+        
+    return status;
 }
 
 
 std_return_type_t RTCIf_clear_alarm(identifier_t alarm_id)
 {
-    return E_NOT_IMPLEMENTED;
+    if(alarm_id == 1)
+    {
+        STM32F4XX_RTC_REG->RTC_CR.ALRAE = 0;
+        STM32F4XX_RTC_REG->RTC_CR.ALRAIE = 0;
+
+        if(STM32F4XX_RTC_REG->RTC_CR.ALRBE == 0)
+        {
+            stm32f4xx_disable_interrupt(STM32F4xx_EXTI17_RTC_ALARM_IRQ);
+        }
+    }
+    else if(alarm_id == 2)
+    {
+        STM32F4XX_RTC_REG->RTC_CR.ALRBE = 0;
+        STM32F4XX_RTC_REG->RTC_CR.ALRBIE = 0;
+
+        if(STM32F4XX_RTC_REG->RTC_CR.ALRAE == 0)
+        {
+            stm32f4xx_disable_interrupt(STM32F4xx_EXTI17_RTC_ALARM_IRQ);
+        }
+    }
+    else
+    {
+        return E_NOT_EXISTING;
+    }
+    return E_OK;
 }
 
 
+void EXTI17_RTC_ALARM_Handler()
+{
+    STM32F4xx_EXTI->EXTI_PR |= (1 << 17) ;
+    if(STM32F4XX_RTC_REG->RTC_ISR.ALRAF == 1)
+    {
+        STM32F4XX_RTC_REG->RTC_ISR.ALRAF = 0; 
+        if(alarm_a_buffer != NULL)
+        {
+            (void) RTCIf_get_date_time(alarm_a_buffer);
+        }
+        alarm_a_callback(alarm_a_buffer);
+    }
+    else if(STM32F4XX_RTC_REG->RTC_ISR.ALRBF == 1)
+    {
+        STM32F4XX_RTC_REG->RTC_ISR.ALRBF = 0; 
+        if(alarm_b_buffer != NULL)
+        {
+            (void) RTCIf_get_date_time(alarm_b_buffer);
+        }
+        alarm_b_callback(alarm_a_buffer);
+    }
+}
