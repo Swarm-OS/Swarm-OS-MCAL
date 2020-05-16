@@ -9,13 +9,12 @@
  */
 
 #include <mcus.h>
-#if IS_MCU(MCU_STM32F411)
 
 #include <stdint.h>
 #include "../../../includes/datatypes.h"
-#include "../../../includes/gpio.h"
+#include "../../../includes/GPIOIf.h"
+#include "../../../includes/pins.h"
 #include "stm32f4xx.h"
-#include "stm32f4xx_pins.h"
 #include "stm32f4xx_interrupt.h"
 
 
@@ -602,7 +601,7 @@ void EXTI0_Handler(void)
 
 void EXTI1_Handler(void)
 {
-    uint8_t id = ( 0x01 << 1)
+    uint8_t id = ( 0x01 << 1);
     STM32F4xx_EXTI->EXTI_PR |= id;
     if(EXTI_mask & id )
     {
@@ -616,7 +615,7 @@ void EXTI1_Handler(void)
 
 void EXTI2_Handler(void)
 {
-    uint8_t id = ( 0x01 << 2)
+    uint8_t id = ( 0x01 << 2);
     STM32F4xx_EXTI->EXTI_PR |= id;
     if(EXTI_mask & id )
     {
@@ -630,7 +629,7 @@ void EXTI2_Handler(void)
 
 void EXTI3_Handler(void)
 {
-    uint8_t id = ( 0x01 << 3)
+    uint8_t id = ( 0x01 << 3);
     STM32F4xx_EXTI->EXTI_PR |= id;
     if(EXTI_mask & id )
     {
@@ -644,7 +643,7 @@ void EXTI3_Handler(void)
 
 void EXTI4_Handler(void)
 {
-    uint8_t id = ( 0x01 << 4)
+    uint8_t id = ( 0x01 << 4);
     STM32F4xx_EXTI->EXTI_PR |= id;
     if(EXTI_mask & id )
     {
@@ -655,5 +654,3 @@ void EXTI4_Handler(void)
         stm32f4xx_disable_interrupt(STM32F4xx_EXTI4_IRQ);
     }    
 }
-#endif
-

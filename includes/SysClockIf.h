@@ -42,7 +42,7 @@ typedef struct _SystemClock_clock
     identifier_t child_clock_id;                    // list of clocks which use this clock as input -1 if not existing
     identifier_t sibling_clock_id;                  // next clock which uses parent_clock as direct parent -1 if not existing
     SysClock_clock_type_t clock_type;       // type of clock source for this clock
-    const char ** name;                     // name of the clock
+    const char *name;                       // name of the clock
 } SystemClock_clock_t;
 
 
@@ -191,5 +191,14 @@ const char * SysClockIf_get_clock_name(identifier_t id);
  */
 uint8_t SysClockIf_get_number_of_clocks(void);
 
+/**
+ * @brief Get current frequency of a clock
+ *  
+ * This function returns frequency of a clock
+ * 
+ * @param  identifier_t id          : Clock id
+ * @return uint32_t frequency       : Clock frequency
+ */
+uint32_t SysClockIf_get_clock_frequency(identifier_t id);
 
 #endif

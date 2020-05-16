@@ -38,6 +38,8 @@
 #       define CURRENT_MCU MCU_ATMEL_ATMEGA328
 #   elif defined(STM32F411)
 #       define CURRENT_MCU MCU_STM32F411
+#   elif defined(STM32F407VG)
+#       define CURRENT_MCU MCU_STM32F407
 #   endif
 #endif
 
