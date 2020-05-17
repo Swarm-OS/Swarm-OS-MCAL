@@ -16,9 +16,6 @@
 #include <stddef.h>
 #include "stm32f4xx_SysClockIf.h"
 
-extern SystemClock_clock_t sys_clock_config[];
-extern const char *clock_names[];
-
 boolean _stm32f4xx_sysclock_initiliazid = FALSE;
 
 std_return_type_t SysClockIf_config(SystemClock_clock_t *cfg)
@@ -39,7 +36,7 @@ std_return_type_t SysClockIf_get_config(SystemClock_clock_t *cfg, size_t size)
     {
         return E_VALUE_ERR;
     }
-    memcpy(cfg, sys_clock_config, sizeof(sys_clock_config));
+    memcpy(cfg, &sys_clock_config, sizeof(sys_clock_config));
     return E_OK;
 }
 
@@ -69,7 +66,7 @@ std_return_type_t SysClockIf_get_clock_config_name(char *name, SystemClock_clock
 
 identifier_t SysClockIf_get_clock_id(char* name)
 {
-    for(uint8_t i=0; i< SYSCLOCK_ENTRIES; i++)
+    for(uint8_t i=0; i< SYSCLOCK_ENTRIES(); i++)
     {
         // maximum length of available clock name is 29 chars 
         if(strncmp(name, clock_names[i], 30) == 0)
@@ -83,7 +80,7 @@ identifier_t SysClockIf_get_clock_id(char* name)
 
 const char * SysClockIf_get_clock_name(identifier_t id)
 {
-    if(id >= SYSCLOCK_ENTRIES)
+    if(id >= SYSCLOCK_ENTRIES())
     {
         return NULL;
     }
@@ -92,7 +89,7 @@ const char * SysClockIf_get_clock_name(identifier_t id)
 
 uint8_t SysClockIf_get_number_of_clocks(void)
 {
-    return SYSCLOCK_ENTRIES;
+    return SYSCLOCK_ENTRIES();
 }
 
 uint32_t SysClockIf_get_clock_frequency(identifier_t id)

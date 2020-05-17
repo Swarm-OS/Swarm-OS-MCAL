@@ -42,7 +42,7 @@ typedef struct _SystemClock_clock
     identifier_t child_clock_id;                    // list of clocks which use this clock as input -1 if not existing
     identifier_t sibling_clock_id;                  // next clock which uses parent_clock as direct parent -1 if not existing
     SysClock_clock_type_t clock_type;       // type of clock source for this clock
-    const char ** name;                     // name of the clock
+    const char *name;                       // name of the clock
 } SystemClock_clock_t;
 
 
