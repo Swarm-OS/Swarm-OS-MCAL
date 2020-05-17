@@ -412,8 +412,7 @@ typedef union __STM32F4xx_I2C_CCR_Regdef
 {
     struct
     {
-        volatile uint16_t CCR_L         :   8;  // Bit  0- 7
-        volatile uint16_t CCR_H         :   4;  // Bit  8-11
+        volatile uint16_t CCR           :  12;  // Bit  0-11
         const uint16_t __reserved       :   2;  // Bit 12-13
         volatile uint16_t DUTY          :   1;  // Bit    14
         volatile uint16_t FS            :   1;  // Bit    15
