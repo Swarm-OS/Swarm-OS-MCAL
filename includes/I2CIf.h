@@ -17,6 +17,7 @@
 
 typedef enum _I2CIf_device_mode
 {
+    I2CIF_DISABLED                  = 0x00, // disable I2C bus access
     I2CIF_MASTER                    = 0x01, // I2C bus access as I2C master device
     I2CIF_SLAVE                     = 0x02, // I2C bus access as I2C slave device
     I2CIF_MASTER_SLAVE              = 0x03, // I2C bus access as I2C master and slave device
@@ -53,34 +54,38 @@ typedef enum _I2CIf_duty_cycle
 
 typedef enum _I2CIf_bus_state
 {
-    I2CIF_STATE_IDLE                = 0x00, // Bus is idle, no communication is taking place
-    I2CIF_STATE_BUSY                = 0x01, // Bus is corrently in used by other devices
-    I2CIF_STATE_ARBITRATION         = 0x02, // Device tries to get the arbitration of the bus i.e. waiting on successful send of start condition
+    I2CIF_STATE_DISABLED            = 0x00, // Bus currently disabled
+    I2CIF_STATE_IDLE                = 0x01, // Bus is idle, no communication is taking place
+    I2CIF_STATE_BUSY                = 0x02, // Bus is corrently in used by other devices
+    I2CIF_STATE_ARBITRATION         = 0x03, // Device tries to get the arbitration of the bus i.e. waiting on successful send of start condition
     I2CIF_STATE_MASTER_TRANSMITTER  = 0x10, // This device is active as master transmitter
-    I2CIF_STATE_MASTER_RECEiVER     = 0x11, // This device is active as master receiver
+    I2CIF_STATE_MASTER_RECEIVER     = 0x11, // This device is active as master receiver
     I2CIF_STATE_SLAVE_TRANSMITTER   = 0x20, // This device is active as slave transmitter
-    I2CIF_STATE_SLAVE_RECEiVER      = 0x21, // This device is active as slave receiver
+    I2CIF_STATE_SLAVE_RECEIVER      = 0x21, // This device is active as slave receiver
     
 } I2CIf_bus_state_t;
 
-typedef struct _I2CIf_status
+typedef union _I2CIf_status
 {
-    uint16_t start_bit_sent         :   1;
-    uint16_t address_sent           :   1;
-    uint16_t address_matched        :   1;
-    uint16_t header_10bit_sent      :   1;
-    uint16_t stop_received          :   1;
-    uint16_t transmit_finished      :   1;
-    uint16_t receive_finished       :   1;
-    uint16_t rcv_buffer_not_empty   :   1;
-    uint16_t transmit_buffer_empty  :   1;
-    uint16_t bus_error              :   1;
-    uint16_t arbitration_lost       :   1;
-    uint16_t acknowledge_failur     :   1;
-    uint16_t overrung_underrun      :   1;
-    uint16_t PEC_error              :   1;
-    uint16_t timeout                :   1;
-    uint16_t general_addr_call_rcv  :   1;
+    struct 
+    {
+        uint16_t start_bit_sent         :   1;
+        uint16_t address_sent_matched   :   1;
+        uint16_t header_10bit_sent      :   1;
+        uint16_t stop_received          :   1;
+        uint16_t transmit_finished      :   1;
+        uint16_t receive_finished       :   1;
+        uint16_t rcv_buffer_not_empty   :   1;
+        uint16_t transmit_buffer_empty  :   1;
+        uint16_t bus_error              :   1;
+        uint16_t arbitration_lost       :   1;
+        uint16_t acknowledge_failure    :   1;
+        uint16_t overrun_underrun       :   1;
+        uint16_t PEC_error              :   1;
+        uint16_t timeout                :   1;
+        uint16_t general_addr_call_rcv  :   1;
+    };
+    uint16_t raw;    
 } I2CIf_status_t;
 
 
@@ -97,8 +102,8 @@ typedef struct _I2CIf_slave_config
 
 typedef struct _I2CIf_master_config
 {
-    void (*send_callback)(I2CIf_status_t);                      // callback function when the write cycle has finished
-    void (*read_callback)(I2CIf_status_t,uint8_t, uint8_t*);    // callback to return buffer and read length when read is finished
+    void (*send_callback)();                                    // callback function when the write cycle has finished
+    void (*read_callback)(uint8_t, uint8_t*);                   // callback to return buffer and read length when read is finished
     void (*error_callback)(I2CIf_status_t);                     // callback if a error was detected
     uint32_t scl_frequency;                                     // desired frequency of the I2C Serial Clock
     uint16_t prescaler;                                         // prescaler for the peripheral
@@ -166,7 +171,7 @@ std_return_type_t I2CIf_config(identifier_t i2c_bus_id, I2CIf_handle_t *bus_cfg)
  * stop condition is sent on the bus. If I2CIF_SEND_START is set in flags
  * a new start condition will be sent. 
  * 
- * @param  identifier_t i2c_bus_id          : I2C bus which shall start the connection
+ * @param  identifier_t i2c_bus_id  : I2C bus which shall start the connection
  * @param  I2CIf_flags flags        : Flags to be sent
  * @param  uint16_t address         : I2C to be used
  * @param  uint16_t data_length     : data length to transmat
@@ -189,7 +194,7 @@ std_return_type_t I2CIf_send(identifier_t i2c_bus_id, I2CIf_flags_t flags, uint1
  * This function starts reading from the I2C bus. If I2CIF_SEND_START is set in 
  * flags a new start condition will be sent. 
  * 
- * @param  identifier_t i2c_bus_id          : I2C bus which shall start the connection
+ * @param  identifier_t i2c_bus_id  : I2C bus which shall start the connection
  * @param  I2CIf_flags flags        : Flags to be sent
  * @param  uint16_t address         : I2C to be used
  * @param  uint16_t buffer_length   : size of data to be read from the bus
@@ -207,7 +212,7 @@ std_return_type_t I2CIf_read(identifier_t i2c_bus_id, I2CIf_flags_t flags, uint1
  *  
  * This function triggers the I2C to send a stop condition.
  * 
- * @param  identifier_t i2c_bus_id          : I2C bus which shall start the connection
+ * @param  identifier_t i2c_bus_id  : I2C bus which shall start the connection
  * @return std_return_type_t status : If the bus id does not exist on the host
  *                                    the function returns E_NOT_EXISTING. If
  *                                    the I2C is not master or did not start the
@@ -215,6 +220,26 @@ std_return_type_t I2CIf_read(identifier_t i2c_bus_id, I2CIf_flags_t flags, uint1
  *                                    E_STATE_ERR. Else it returns E_OK.
  */
 std_return_type_t I2CIf_stop_transmission(identifier_t i2c_bus_id);
+
+/**
+ * @brief Get the current devices status
+ *  
+ * This function returns the current device status.
+ * 
+ * @param  identifier_t i2c_bus_id  : I2C bus which shall start the connection
+ * @return I2CIf_status_t status    : The status of the device
+ */
+I2CIf_status_t I2CIf_get_status(identifier_t i2c_bus_id);
+
+/**
+ * @brief Get the current state of the bus
+ *  
+ * This function returns the current bus status.
+ * 
+ * @param  identifier_t i2c_bus_id  : I2C bus which shall start the connection
+ * @return I2CIf_bus_state_t status : The status of the bus
+ */
+I2CIf_bus_state_t I2CIf_get_bus_status(identifier_t i2c_bus_id);
 
 
 #endif
