@@ -43,7 +43,7 @@ std_return_type_t SysClockIf_get_config(SystemClock_clock_t *cfg, size_t size)
 
 std_return_type_t SysClockIf_get_clock_config(identifier_t id, SystemClock_clock_t *cfg)
 {
-    if(id > SYSCLOCK_ENTRIES)
+    if(id > SYSCLOCK_ENTRIES())
     {
         return E_NOT_EXISTING;
     }
@@ -94,7 +94,7 @@ uint8_t SysClockIf_get_number_of_clocks(void)
 
 uint32_t SysClockIf_get_clock_frequency(identifier_t id)
 {
-    if(id >= SYSCLOCK_ENTRIES)
+    if(id >= SYSCLOCK_ENTRIES())
     {
         return 0;
     }
