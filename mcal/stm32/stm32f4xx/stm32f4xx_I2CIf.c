@@ -434,7 +434,8 @@ std_return_type_t I2CIf_send(identifier_t i2c_bus_id, I2CIf_flags_t flags, uint1
     }
 
     bus_config[i2c_bus_id-1].state = I2CIF_STATE_ARBITRATION;
-
+    bus_config[i2c_bus_id-1].flags = flags;
+    
     return E_OK;
 }
 
@@ -533,7 +534,7 @@ I2CIf_status_t I2CIf_get_status(identifier_t i2c_bus_id)
 {
     I2CIf_status_t status;
     status.raw = 0;
-    
+
     STM32F4xx_I2C_RegDef_t* registers;
     if(i2c_bus_id == 1)
     {
