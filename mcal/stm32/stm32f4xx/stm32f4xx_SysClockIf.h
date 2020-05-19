@@ -15,7 +15,7 @@
 #include <SysClockIf.h>
 
 #if IS_MCU(MCU_STM32F411)
-const char *clock_names[] =
+const char clock_names[27][30] =
 {
     "HSI",                          
     "HSE",                        
@@ -80,11 +80,11 @@ SystemClock_clock_t sys_clock_config[] =
 #endif
 
 #if IS_MCU(MCU_STM32F407)
-
-char clock_names[27][30] ={
-    "HSI\0",
-    "HSE",
-    "LSI",
+const char clock_names[27][30] =
+{
+    "HSI",                          
+    "HSE",                        
+    "LSI",                          
     "LSE",                          
     "Main PLL Input Clock Source",  
     "Main PLL Input Clock Divisor", 
@@ -142,7 +142,8 @@ SystemClock_clock_t sys_clock_config[] =
     {  12500000,                 0,              0,        1,    26,      -1,         2,                   SYSCLOCK_CLK_PRESCALER,  clock_names[25]}, // RTC HSE Prescaler                      
     {     32000,                 0,        1000000,        2,     1,      -1,         1,                    SYSCLOCK_CLK_SELECTOR,  clock_names[26]}, // RTC Clock Source                   
 };
-
 #endif
-#define SYSCLOCK_ENTRIES (sizeof(sys_clock_config)/sizeof(SystemClock_clock_t))
+
+#define SYSCLOCK_ENTRIES() (sizeof(sys_clock_config)/sizeof(SystemClock_clock_t))
+
 #endif

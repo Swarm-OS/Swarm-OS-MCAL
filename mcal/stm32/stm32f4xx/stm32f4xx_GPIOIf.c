@@ -9,7 +9,6 @@
  */
 
 #include <mcus.h>
-
 #include <stdint.h>
 #include "../../../includes/datatypes.h"
 #include "../../../includes/GPIOIf.h"
@@ -22,9 +21,17 @@
 static void (*EXTI_cbs[16]) (void) = {};
 static uint16_t EXTI_mask = 0; 
 
-boolean pin_exists(GPIOIf_pin_t pin);
-void set_interrupt_register(GPIOIf_pin_t pin);
-void clear_interrupt_register(GPIOIf_pin_t pin);
+static boolean pin_exists(GPIOIf_pin_t pin);
+static STM32F4xx_GPIO_RegDef_t *get_port_register (GPIOIf_pin_t pin);
+
+static void set_interrupt_register(GPIOIf_pin_t pin);
+static void clear_interrupt_register(GPIOIf_pin_t pin);
+
+static std_return_type_t set_pin_mode(GPIOIf_pin_config_t *cfg, STM32F4xx_GPIO_RegDef_t *port );
+static std_return_type_t set_output_mode(GPIOIf_pin_config_t *cfg, STM32F4xx_GPIO_RegDef_t *port );
+static std_return_type_t set_pullup_cfg(GPIOIf_pin_config_t *cfg, STM32F4xx_GPIO_RegDef_t *port );
+static std_return_type_t set_alternate_function(GPIOIf_pin_config_t *cfg, STM32F4xx_GPIO_RegDef_t *port );
+static std_return_type_t set_input_trigger(GPIOIf_pin_config_t *cfg, STM32F4xx_GPIO_RegDef_t *port );
 
 std_return_type_t GPIOIf_init(GPIOIf_pin_t port)
 {
@@ -85,43 +92,49 @@ std_return_type_t GPIOIf_deinit(GPIOIf_pin_t port)
     return E_OK;
 }
 
-std_return_type_t GPIOIf_config_pin(GPIOIf_pin_t pin, GPIOIf_pin_mode_t mode, GPIOIf_pullup_mode_t pullup)
+std_return_type_t GPIOIf_config_pin(GPIOIf_pin_config_t *cfg)
 {
-    if(FALSE == pin_exists( pin))
+    if(FALSE == pin_exists( cfg->pin))
     {
         return E_NOT_EXISTING;
     }
 
-    STM32F4xx_GPIO_RegDef_t *port;
-    
-    uint8_t pin_number = (uint8_t) GPIOIf_get_pin_number(pin);
-    
-    switch (GPIOIf_get_port(pin))
+    STM32F4xx_GPIO_RegDef_t *port = get_port_register(cfg->pin);
+
+    std_return_type_t status = set_pin_mode(cfg, port);
+    if(status != E_OK)
     {
-    case PORT_A:
-        port = STM32F4xx_GPIOA;
-        break;
-    case PORT_B:
-        port = STM32F4xx_GPIOB;
-        break;
-    case PORT_C:
-        port = STM32F4xx_GPIOC;
-        break;
-    case PORT_D:
-        port = STM32F4xx_GPIOD;
-        break;
-    case PORT_E:
-        port = STM32F4xx_GPIOE;
-        break;
-    case PORT_H:
-        port = STM32F4xx_GPIOH;
-        break;
-    default:
-        return E_NOT_SUPPORTED;
-        break;
+        return status;
     }
 
-    switch (mode)
+    status = set_output_mode(cfg, port);
+    if(status != E_OK)
+    {
+        return status;
+    }
+
+    status = set_pullup_cfg(cfg, port);
+    if(status != E_OK)
+    {
+        return status;
+    }
+
+    status = set_input_trigger(cfg, port);
+    if(status != E_OK)
+    {
+        return status;
+    }
+
+
+    return E_OK;
+}
+
+static std_return_type_t set_pin_mode(GPIOIf_pin_config_t *cfg, STM32F4xx_GPIO_RegDef_t *port )
+{
+    uint8_t pin_number = (uint8_t) GPIOIf_get_pin_number(cfg->pin);
+    std_return_type_t status = E_OK;
+
+    switch (cfg->pin_mode)
     {
     case GPIOIf_INPUT:
         // set pin mode
@@ -135,8 +148,12 @@ std_return_type_t GPIOIf_config_pin(GPIOIf_pin_t pin, GPIOIf_pin_mode_t mode, GP
         // set pin mode
         port->MODER &= ~(0x2 << (pin_number <<1));
         port->MODER |=  (0x1 << (pin_number <<1));
-        // output driver configuration - push-pull
-        port->OTYPER &= ~(0x1 << (pin_number));
+        break;
+    case GPIOIf_ALTERNAT_FN:
+        // set pin mode
+        port->MODER &= ~(0x1 << (pin_number <<1));
+        port->MODER |=  (0x2 << (pin_number <<1));
+        status = set_alternate_function(cfg, port);
         break;
     case GPIOIf_OUTPUT_ANALOG  :
     default:
@@ -144,7 +161,37 @@ std_return_type_t GPIOIf_config_pin(GPIOIf_pin_t pin, GPIOIf_pin_mode_t mode, GP
         break;
     }
 
-    switch (pullup)
+    return status;
+}
+
+static std_return_type_t set_output_mode(GPIOIf_pin_config_t *cfg, STM32F4xx_GPIO_RegDef_t *port )
+{
+
+    uint8_t pin_number = (uint8_t) GPIOIf_get_pin_number(cfg->pin);
+
+    switch (cfg->output_mode)
+    {
+    case GPIOIF_OUTPUT_PUSH_PULL:
+        // set pin mode
+        port->OTYPER &= ~(1 << pin_number);
+        break;
+    case GPIOIF_OUTPUT_OPEN_DRAIN   :
+        // set pin mode
+        port->OTYPER |=  (1 << pin_number);
+        break;
+    default:
+        return E_NOT_SUPPORTED;
+        break;
+    }
+
+    return E_OK;
+
+}
+
+static std_return_type_t set_pullup_cfg(GPIOIf_pin_config_t *cfg, STM32F4xx_GPIO_RegDef_t *port )
+{
+    uint8_t pin_number = (uint8_t) GPIOIf_get_pin_number(cfg->pin);
+    switch (cfg->pullup_mode)
     {
     case GPIOIf_NO_PULLUP:
         // disable pullups/pulldowns
@@ -165,234 +212,40 @@ std_return_type_t GPIOIf_config_pin(GPIOIf_pin_t pin, GPIOIf_pin_mode_t mode, GP
         return E_NOT_SUPPORTED;
         break;
     }
+    return E_OK;
+}
+
+static std_return_type_t set_alternate_function(GPIOIf_pin_config_t *cfg, STM32F4xx_GPIO_RegDef_t *port )
+{
+
+    if(cfg->alternate_function > 15)
+    {
+        return E_VALUE_ERR;
+    }
+
+    uint8_t pin_number = (uint8_t) GPIOIf_get_pin_number(cfg->pin);
+
+     if(pin_number < 8)
+    {
+        uint8_t shift = pin_number*4;
+        port->AFRL &= ~(0xF << shift);
+        port->AFRL |=  (cfg->alternate_function & 0xF) << shift;
+    }
+    else
+    {
+        uint8_t shift = (pin_number-8)*4;
+        port->AFRH &= ~(0xF << shift);
+        port->AFRH |=  (cfg->alternate_function & 0xF) << shift;
+    }
 
     return E_OK;
 }
 
-std_return_type_t GPIOIf_pin_set(GPIOIf_pin_t pin)
+static std_return_type_t set_input_trigger(GPIOIf_pin_config_t *cfg, STM32F4xx_GPIO_RegDef_t *port )
 {
-    if(FALSE == pin_exists( pin))
-    {
-        return E_NOT_EXISTING;
-    }
+    uint8_t pin_number = (uint8_t) GPIOIf_get_pin_number(cfg->pin);
 
-    STM32F4xx_GPIO_RegDef_t *port;
-    uint8_t pin_number = (uint8_t) GPIOIf_get_pin_number(pin);
-    
-    switch (GPIOIf_get_port(pin))
-    {
-    case PORT_A:
-        port = STM32F4xx_GPIOA;
-        break;
-    case PORT_B:
-        port = STM32F4xx_GPIOB;
-        break;
-    case PORT_C:
-        port = STM32F4xx_GPIOC;
-        break;
-    case PORT_D:
-        port = STM32F4xx_GPIOD;
-        break;
-    case PORT_E:
-        port = STM32F4xx_GPIOE;
-        break;
-    case PORT_H:
-        port = STM32F4xx_GPIOH;
-        break;
-    default:
-        return E_NOT_SUPPORTED;
-        break;
-    }
-   
-    port->BSRR |= (1 << pin_number);
-    return E_OK;
-}
-
-std_return_type_t GPIOIf_pin_clear(GPIOIf_pin_t pin)
-{
-    if(FALSE == pin_exists( pin))
-    {
-        return E_NOT_EXISTING;
-    }
-
-    STM32F4xx_GPIO_RegDef_t *port;
-    uint8_t pin_number = (uint8_t) GPIOIf_get_pin_number(pin)+ 16;
-
-    switch (GPIOIf_get_port(pin))
-    {
-    case PORT_A:
-        port = STM32F4xx_GPIOA;
-        break;
-    case PORT_B:
-        port = STM32F4xx_GPIOB;
-        break;
-    case PORT_C:
-        port = STM32F4xx_GPIOC;
-        break;
-    case PORT_D:
-        port = STM32F4xx_GPIOD;
-        break;
-    case PORT_E:
-        port = STM32F4xx_GPIOE;
-        break;
-    case PORT_H:
-        port = STM32F4xx_GPIOH;
-        break;
-    default:
-        return E_NOT_SUPPORTED;
-        break;
-    }
-
-    port->BSRR |= (1 << pin_number);
-    return E_OK;
-}
-
-std_return_type_t GPIOIf_port_set(GPIOIf_pin_t pin, uint16_t value)
-{
-    if(FALSE == pin_exists( pin))
-    {
-        return E_NOT_EXISTING;
-    }
-    
-    STM32F4xx_GPIO_RegDef_t *port;
-
-    switch (GPIOIf_get_port(pin))
-    {
-    case PORT_A:
-        port = STM32F4xx_GPIOA;
-        break;
-    case PORT_B:
-        port = STM32F4xx_GPIOB;
-        break;
-    case PORT_C:
-        port = STM32F4xx_GPIOC;
-        break;
-    case PORT_D:
-        port = STM32F4xx_GPIOD;
-        break;
-    case PORT_E:
-        port = STM32F4xx_GPIOE;
-        break;
-    case PORT_H:
-        port = STM32F4xx_GPIOH;
-        break;
-    default:
-        return E_NOT_SUPPORTED;
-        break;
-    }
-
-    port->ODR |= value;
-    port->ODR &= (((uint32_t)0xFFFF) << 16 )| value;
-    
-
-    return E_NOT_IMPLEMENTED;
-}
-
-std_return_type_t GPIOIf_pin_set_analog(GPIOIf_pin_t pin, uint16_t value)
-{
-    return E_NOT_SUPPORTED;
-}
-
-std_return_type_t GPIOIf_pin_iset_analog(GPIOIf_pin_t pin, uint16_t value)
-{    
-    return E_NOT_SUPPORTED;
-}
-
-boolean GPIOIf_pin_read(GPIOIf_pin_t pin)
-{
-    if(FALSE == pin_exists( pin))
-    {
-        return FALSE;
-    }
-
-    STM32F4xx_GPIO_RegDef_t *port;
-    uint8_t pin_number = (uint8_t) GPIOIf_get_pin_number(pin);
-
-    switch (GPIOIf_get_port(pin))
-    {
-    case PORT_A:
-        port = STM32F4xx_GPIOA;
-        break;
-    case PORT_B:
-        port = STM32F4xx_GPIOB;
-        break;
-    case PORT_C:
-        port = STM32F4xx_GPIOC;
-        break;
-    case PORT_D:
-        port = STM32F4xx_GPIOD;
-        break;
-    case PORT_E:
-        port = STM32F4xx_GPIOE;
-        break;
-    case PORT_H:
-        port = STM32F4xx_GPIOH;
-        break;
-    default:
-        return FALSE;
-        break;
-    }
-
-    if(port->IDR & (1 << pin_number))
-    {
-        return TRUE;
-    }
-        
-    return FALSE;
-}
-
-std_return_type_t GPIOIf_port_read(GPIOIf_pin_t pin, uint16_t* buffer)
-{
-    if(FALSE == pin_exists( pin))
-    {
-        return E_NOT_EXISTING;
-    }
-
-    STM32F4xx_GPIO_RegDef_t *port;
-    
-    switch (GPIOIf_get_port(pin))
-    {
-    case PORT_A:
-        port = STM32F4xx_GPIOA;
-        break;
-    case PORT_B:
-        port = STM32F4xx_GPIOB;
-        break;
-    case PORT_C:
-        port = STM32F4xx_GPIOC;
-        break;
-    case PORT_D:
-        port = STM32F4xx_GPIOD;
-        break;
-    case PORT_E:
-        port = STM32F4xx_GPIOE;
-        break;
-    case PORT_H:
-        port = STM32F4xx_GPIOH;
-        break;
-    default:
-        return FALSE;
-        break;
-    }
-    *buffer = port->IDR & 0xFFFF;
-    return E_OK;
-}
-
-std_return_type_t GPIOIf_input_trigger(GPIOIf_pin_t pin, GPIOIf_trigger_t trigger, void (*callback)(void))
-{
-    if(FALSE == pin_exists( pin))
-    {
-        return E_NOT_EXISTING;
-    }
-    
-    uint8_t pin_number = (uint8_t) GPIOIf_get_pin_number(pin);
-    
-    if(pin_number > 4)
-    {
-        return E_NOT_IMPLEMENTED;
-    } 
-
-    switch (trigger)
+    switch (cfg->trigger)
     {
         case GPIOIf_NO_TRIGGER:
             // clear rising trigger flag
@@ -427,23 +280,110 @@ std_return_type_t GPIOIf_input_trigger(GPIOIf_pin_t pin, GPIOIf_trigger_t trigge
             break;
     }
 
-    if(trigger == GPIOIf_NO_TRIGGER)
+    if(cfg->trigger == GPIOIf_NO_TRIGGER)
     {
         EXTI_mask &= ~(1 << pin_number);
         EXTI_cbs[pin_number] = 0UL;
-        clear_interrupt_register(pin);
+        clear_interrupt_register(cfg->pin);
     }
     else
     {
-        EXTI_cbs[pin_number] = callback;
+        EXTI_cbs[pin_number] = cfg->callback;
         EXTI_mask |= (1 << pin_number);
-        set_interrupt_register(pin);
+        set_interrupt_register(cfg->pin);
     }
 
     return E_OK;
 }
+                                  
 
-boolean pin_exists(GPIOIf_pin_t pin)
+std_return_type_t GPIOIf_pin_set(GPIOIf_pin_t pin)
+{
+    if(FALSE == pin_exists( pin))
+    {
+        return E_NOT_EXISTING;
+    }
+
+    STM32F4xx_GPIO_RegDef_t *port = get_port_register(pin);
+    uint8_t pin_number = (uint8_t) GPIOIf_get_pin_number(pin);
+   
+    port->BSRR |= (1 << pin_number);
+    return E_OK;
+}
+
+std_return_type_t GPIOIf_pin_clear(GPIOIf_pin_t pin)
+{
+    if(FALSE == pin_exists( pin))
+    {
+        return E_NOT_EXISTING;
+    }
+
+    STM32F4xx_GPIO_RegDef_t *port = get_port_register(pin);
+    uint8_t pin_number = (uint8_t) GPIOIf_get_pin_number(pin)+ 16;
+
+    port->BSRR |= (1 << pin_number);
+    return E_OK;
+}
+
+std_return_type_t GPIOIf_port_set(GPIOIf_pin_t pin, uint16_t value)
+{
+    if(FALSE == pin_exists( pin))
+    {
+        return E_NOT_EXISTING;
+    }
+    
+    STM32F4xx_GPIO_RegDef_t *port = get_port_register(pin);
+
+    port->ODR |= value;
+    port->ODR &= (((uint32_t)0xFFFF) << 16 )| value;
+    
+
+    return E_NOT_IMPLEMENTED;
+}
+
+std_return_type_t GPIOIf_pin_set_analog(GPIOIf_pin_t pin, uint16_t value)
+{
+    return E_NOT_SUPPORTED;
+}
+
+std_return_type_t GPIOIf_pin_iset_analog(GPIOIf_pin_t pin, uint16_t value)
+{    
+    return E_NOT_SUPPORTED;
+}
+
+boolean GPIOIf_pin_read(GPIOIf_pin_t pin)
+{
+    if(FALSE == pin_exists( pin))
+    {
+        return FALSE;
+    }
+
+    STM32F4xx_GPIO_RegDef_t *port = get_port_register(pin);
+    uint8_t pin_number = (uint8_t) GPIOIf_get_pin_number(pin);
+
+
+    if(port->IDR & (1 << pin_number))
+    {
+        return TRUE;
+    }
+        
+    return FALSE;
+}
+
+std_return_type_t GPIOIf_port_read(GPIOIf_pin_t pin, uint16_t* buffer)
+{
+    if(FALSE == pin_exists( pin))
+    {
+        return E_NOT_EXISTING;
+    }
+
+    STM32F4xx_GPIO_RegDef_t *port = get_port_register(pin);
+    
+    *buffer = port->IDR & 0xFFFF;
+    return E_OK;
+}
+
+static boolean pin_exists(GPIOIf_pin_t pin)
 {
     GPIOIf_pin_t pin_port = GPIOIf_get_port(pin);
 
@@ -471,8 +411,38 @@ boolean pin_exists(GPIOIf_pin_t pin)
     return TRUE;
 }
 
+static STM32F4xx_GPIO_RegDef_t *get_port_register (GPIOIf_pin_t pin)
+{
+    STM32F4xx_GPIO_RegDef_t *port;
+    
+    switch (GPIOIf_get_port(pin))
+    {
+    case PORT_A:
+        port = STM32F4xx_GPIOA;
+        break;
+    case PORT_B:
+        port = STM32F4xx_GPIOB;
+        break;
+    case PORT_C:
+        port = STM32F4xx_GPIOC;
+        break;
+    case PORT_D:
+        port = STM32F4xx_GPIOD;
+        break;
+    case PORT_E:
+        port = STM32F4xx_GPIOE;
+        break;
+    case PORT_H:
+        port = STM32F4xx_GPIOH;
+        break;
+    default:
+        break;
+    }
 
-void set_interrupt_register(GPIOIf_pin_t pin)
+    return port;
+}
+
+static void set_interrupt_register(GPIOIf_pin_t pin)
 {
     uint8_t pin_number = (uint8_t) GPIOIf_get_pin_number(pin);
     uint8_t shift = (pin_number & 0x3) << 2;
@@ -543,7 +513,7 @@ void set_interrupt_register(GPIOIf_pin_t pin)
     } 
 }   
 
-void clear_interrupt_register(GPIOIf_pin_t pin)
+static void clear_interrupt_register(GPIOIf_pin_t pin)
 {
     uint8_t pin_number = (uint8_t) GPIOIf_get_pin_number(pin);
     

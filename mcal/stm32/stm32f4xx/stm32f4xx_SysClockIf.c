@@ -43,7 +43,7 @@ std_return_type_t SysClockIf_get_config(SystemClock_clock_t *cfg, size_t size)
 
 std_return_type_t SysClockIf_get_clock_config(identifier_t id, SystemClock_clock_t *cfg)
 {
-    if(id > SYSCLOCK_ENTRIES)
+    if(id > SYSCLOCK_ENTRIES())
     {
         return E_NOT_EXISTING;
     }
@@ -66,12 +66,10 @@ std_return_type_t SysClockIf_get_clock_config_name(char *name, SystemClock_clock
 
 identifier_t SysClockIf_get_clock_id(char* name)
 {
-    for(uint8_t i=0; i< SYSCLOCK_ENTRIES; i++)
+    for(uint8_t i=0; i< SYSCLOCK_ENTRIES(); i++)
     {
-        char *clock_name = clock_names[i];      
-        int32_t test = strncmp(name, clock_name, 31);
         // maximum length of available clock name is 29 chars 
-        if(test == 0)
+        if(strncmp(name, clock_names[i], 30) == 0)
         {
             return i;
         }
@@ -82,7 +80,7 @@ identifier_t SysClockIf_get_clock_id(char* name)
 
 const char * SysClockIf_get_clock_name(identifier_t id)
 {
-    if(id >= SYSCLOCK_ENTRIES)
+    if(id >= SYSCLOCK_ENTRIES())
     {
         return NULL;
     }
@@ -91,12 +89,12 @@ const char * SysClockIf_get_clock_name(identifier_t id)
 
 uint8_t SysClockIf_get_number_of_clocks(void)
 {
-    return SYSCLOCK_ENTRIES;
+    return SYSCLOCK_ENTRIES();
 }
 
 uint32_t SysClockIf_get_clock_frequency(identifier_t id)
 {
-    if(id >= SYSCLOCK_ENTRIES)
+    if(id >= SYSCLOCK_ENTRIES())
     {
         return 0;
     }

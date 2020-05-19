@@ -39,17 +39,24 @@ typedef uint16_t GPIOIf_pin_t;
  * GPIO_OUTPUT_ANALOG  : use pin as analog output
  */
 typedef enum _GPIOIf_pin_mode { 
-    GPIOIf_INPUT          = 0x00,
-    GPIOIf_INPUT_ANALOG   = 0x01,
-    GPIOIf_OUTPUT         = 0x10,
-    GPIOIf_OUTPUT_ANALOG  = 0x11,
+    GPIOIf_INPUT            = 0x00,
+    GPIOIf_INPUT_ANALOG     = 0x01,
+    GPIOIf_OUTPUT           = 0x10,
+    GPIOIf_OUTPUT_ANALOG    = 0x11,
+    GPIOIf_ALTERNAT_FN      = 0x20,
 } GPIOIf_pin_mode_t;
 
 typedef enum _GPIOIf_pullup_mode{
-    GPIOIf_NO_PULLUP     = 0x00,
-    GPIOIf_PULLUP        = 0x01,
-    GPIOIf_PULLDOWN      = 0x02,
+    GPIOIf_NO_PULLUP        = 0x00,
+    GPIOIf_PULLUP           = 0x01,
+    GPIOIf_PULLDOWN         = 0x02,
 } GPIOIf_pullup_mode_t;
+
+typedef enum __GPIOIf_output_mode
+{
+    GPIOIF_OUTPUT_PUSH_PULL =    0x01,
+    GPIOIF_OUTPUT_OPEN_DRAIN=    0x02,
+}GPIOIf_output_mode_t;
 
 typedef enum
 {
@@ -57,8 +64,19 @@ typedef enum
     GPIOIf_FALLING_EDGE  = 0x01,
     GPIOIf_RISING_EDGE   = 0x02,
     GPIOIf_BOTH_EDGES    = 0x03,
-    
 } GPIOIf_trigger_t;
+
+typedef struct __GPIOIf_pin_config
+{ 
+    void (*callback)(void);
+    GPIOIf_pin_t pin;
+    GPIOIf_pin_mode_t pin_mode;
+    uint8_t alternate_function;
+    GPIOIf_pullup_mode_t pullup_mode;
+    GPIOIf_output_mode_t output_mode;
+    GPIOIf_trigger_t trigger;
+} GPIOIf_pin_config_t;
+
 
 /**
  * @brief Initialize GPIO Port
@@ -99,9 +117,8 @@ std_return_type_t GPIOIf_deinit(GPIOIf_pin_t port);
  *                                    returns E_NOT_EXISTING. Else it returns 
  *                                    E_OK.
  */
-std_return_type_t GPIOIf_config_pin(GPIOIf_pin_t pin, 
-                                       GPIOIf_pin_mode_t mode, 
-                                       GPIOIf_pullup_mode_t pullup);
+std_return_type_t GPIOIf_config_pin(GPIOIf_pin_config_t *cfg);
+
 
 /**
  * @brief Set GPIO pin
@@ -203,26 +220,5 @@ boolean GPIOIf_pin_read(GPIOIf_pin_t pin);
  * @return boolean status           : Pin values of the whole port. 
  */
 std_return_type_t GPIOIf_port_read(GPIOIf_pin_t pin, uint16_t* buffer);
-
-/**
- * @brief Sets trigger options of a specific pin
- *  
- * This function sets interrupts according to the given trigger condition.
- * Please check your processor manual which pins support triggering interrupts
- * on edge changes. 
- * 
- * @param  GPIOIf_pin_t pin         : Which pin shall be configured
- * @param  GPIOIf_trigger_t trigger : Trigger condition
- * @param  void (*callback)(void)   : callback function which shall be called
- *                                    after the trigger was acitvated. If 
- *                                    GPIOIf_NO_TRIGGER is used for tigger
- *                                    condition, the callback argument will be
- *                                    ignored. 
- * @return std_return_type_t status : If the pin does not exist the function
- *                                    returns E_NOT_EXISTING, If the pin does
- *                                    not support edge detection, E_NOT_SUPPORTED
- *                                    will be returned. Else E_OK.
- */
-std_return_type_t GPIOIf_input_trigger(GPIOIf_pin_t pin, GPIOIf_trigger_t trigger, void (*callback)(void));
 
 #endif
