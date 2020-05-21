@@ -14,9 +14,20 @@
 #include <stdint.h>
 #include <datatypes.h>
 
+typedef enum _TimerIf_timer_mode
+{
+    TIMERIF_MODE_DISABLED               = 0x00, //  disable Timer
+    TIMERIF_MODE_NORMAL                 = 0x01, //  Normal operation, i.e. just counting
+    TIMERIF_MODE_INPUT_COMPTURE         = 0x10, //  Timer/Channel operates in input capture mode
+    TIMERIF_MODE_INPUT_PWM_COMPTURE     = 0x11, //  Timer/Channel operates in PWM input capture mode
+    TIMERIF_MODE_OUTPUT_COMPARE         = 0x20, //  Timer/Channel operates in output compare mode
+    TIMERIF_MODE_OUTPUT_PWM             = 0x21, //  Timer/Channel generates a PWM
+    TIMERIF_MODE_OUTPUT_SINGLE_SHOT     = 0x22, //  Timer/Channel generates a single impulse after a given time
+} TimerIf_timer_mode_t;
+
 typedef enum _TimerIf_CC_mode
 {
-    TIMERIF_NORMAL                      = 0x00, // Normal operation, i.e. just counting
+    TIMERIF_NORMAL                      = 0x00, 
     TIMERIF_CAPTURE_COMPARE             = 0x01, // Compares timer value with a given "compare" value
     TIMERIF_INPUT_CAPTURE               = 0x02, // Captures external events
     TIMERIF_SINGLE_SHOT                 = 0x03, // Single shot timer
@@ -96,6 +107,8 @@ typedef struct
     void (*callback)(void);     //  Callback when output compare was triggered
     TimerIf_timer_t handle;     //  General Timer Configuration
 } TimerIf_OC_handle_t;
+
+
 
 
 /**
