@@ -814,7 +814,317 @@ typedef struct
 
 #define STM32F4xx_EXTI          ((STM32F4xx_EXTI_RegDef_t* ) _MMIO_ADDR_EXTI)
 
-#define _MMIO_ADDR_ADC      0x40012000UL
+typedef union __STM32F4xx_ADC_SR_Regdef
+{
+    struct
+    {
+        volatile uint32_t AWD           :   1;  // Bit     0 | Analog watchdog flag
+        volatile uint32_t EOC           :   1;  // Bit     1 | Regular channel end of conversion   
+        volatile uint32_t JEOC          :   1;  // Bit     2 | Injected channel end of conversion
+        volatile uint32_t JSTRT         :   1;  // Bit     3 | Injected channel start flag
+        volatile uint32_t STRT          :   1;  // Bit     4 | Regular channel start flag
+        volatile uint32_t OVR           :   1;  // Bit     5 | Overrun
+        const uint32_t _reserved_1      :  26;  // Bit  6-31 | Reserved, must be kept at reset value.
+    };
+    uint32_t raw;
+} STM32F4xx_ADC_SR_Regdef_t;
+
+typedef union __STM32F4xx_ADC_CR1_Regdef
+{
+    struct
+    {
+        volatile uint32_t AWDCH         :   5;  // Bit  0- 4 | Analog watchdog channel select bits
+        volatile uint32_t EOCIE         :   1;  // Bit     5 | Interrupt enable for EOC
+        volatile uint32_t AWDIE         :   1;  // Bit     6 | Analog watchdog interrupt enable
+        volatile uint32_t JEOCIE        :   1;  // Bit     7 | Interrupt enable for injected channels
+        volatile uint32_t SCAN          :   1;  // Bit     8 | Scan mode
+        volatile uint32_t AWDSGL        :   1;  // Bit     9 | Enable the watchdog on a single channel in scan mode
+        volatile uint32_t JAUTO         :   1;  // Bit    10 | Automatic injected group conversion
+        volatile uint32_t DISCEN        :   1;  // Bit    11 | Discontinuous mode on regular channel
+        volatile uint32_t JDISCEN       :   1;  // Bit    12 | Discontinuous mode on injected channels
+        volatile uint32_t DISCNUM       :   3;  // Bit 13-15 | Discontinuous mode channel count
+        const uint32_t _reserved_1      :   6;  // Bit 16-21 | Reserved, must be kept at reset value.
+        volatile uint32_t JAWDEN        :   1;  // Bit    22 | Analog watchdog enable on injected channels
+        volatile uint32_t AWDEN         :   1;  // Bit    23 | Analog watchdog enable on regular channels
+        volatile uint32_t RES           :   2;  // Bit 24-25 | Resolution
+        volatile uint32_t OVRIE         :   1;  // Bit    26 | Overrun interrupt enable
+        const uint32_t _reserved_2      :   5;  // Bit 27-31 | Reserved, must be kept at reset value.
+    };
+    uint32_t raw;
+} STM32F4xx_ADC_CR1_Regdef_t;
+
+typedef union __STM32F4xx_ADC_CR2_Regdef
+{
+    struct
+    {
+        volatile uint32_t ADON          :   1;  // Bit     0 | A/D Converter ON / OFF
+        volatile uint32_t CONT          :   1;  // Bit     1 | Continuous conversion
+        const uint32_t __reserved_1     :   6;  // Bit  2- 7 | Reserved, must be kept at reset value.
+        volatile uint32_t DMA           :   1;  // Bit     8 | Direct memory access mode (for single ADC mode)
+        volatile uint32_t DDS           :   1;  // Bit     9 | DMA disable selection (for single ADC mode)
+        volatile uint32_t EOCS          :   1;  // Bit    10 | End of conversion selection
+        volatile uint32_t ALIGN         :   1;  // Bit    11 | Data alignment
+        const uint32_t _reserved_2      :   4;  // Bit 12-15 | Reserved, must be kept at reset value.
+        volatile uint32_t JEXTSEL       :   4;  // Bit 16-19 | External event select for injected group        
+        volatile uint32_t JEXTEN        :   2;  // Bit 20-21 | External trigger enable for injected channels
+        volatile uint32_t JSWSTART      :   1;  // Bit    22 | Start conversion of injected channels
+        const uint32_t _reserved_3      :   1;  // Bit    23 | Reserved, must be kept at reset value.
+        volatile uint32_t EXTSEL        :   4;  // Bit 24-27 | External event select for regular group
+        volatile uint32_t EXTEN         :   2;  // Bit 28-29 | External trigger enable for regular channels
+        volatile uint32_t SWSTART       :   1;  // Bit    30 | Start conversion of regular channels
+        const uint32_t _reserved_4      :   1;  // Bit    31 | Reserved, must be kept at reset value.
+    };
+    uint32_t raw;
+} STM32F4xx_ADC_CR2_Regdef_t;
+
+typedef union __STM32F4xx_ADC_SMPR1_Regdef
+{
+    struct
+    {
+        volatile uint32_t SMP10         :   3;  // Bit  0- 2 | Channel 10 sampling time selection
+        volatile uint32_t SMP11         :   3;  // Bit  3- 5 | Channel 11 sampling time selection
+        volatile uint32_t SMP12         :   3;  // Bit  6- 8 | Channel 12 sampling time selection
+        volatile uint32_t SMP13         :   3;  // Bit  9-11 | Channel 13 sampling time selection
+        volatile uint32_t SMP14         :   3;  // Bit 12-14 | Channel 14 sampling time selection
+        volatile uint32_t SMP15         :   3;  // Bit 15-17 | Channel 15 sampling time selection
+        volatile uint32_t SMP16         :   3;  // Bit 18-20 | Channel 16 sampling time selection
+        volatile uint32_t SMP17         :   3;  // Bit 21-23 | Channel 17 sampling time selection
+        volatile uint32_t SMP18         :   3;  // Bit 24-26 | Channel 18 sampling time selection
+        const uint32_t __reserved_1     :   5;  // Bit 27-31 | Reserved, must be kept at reset value.
+    };
+    uint32_t raw;
+} STM32F4xx_ADC_SMPR1_Regdef_t;
+
+typedef union __STM32F4xx_ADC_SMPR2_Regdef
+{
+    struct
+    {
+        volatile uint32_t SMP0          :   3;  // Bit  0- 2 | Channel 0 sampling time selection
+        volatile uint32_t SMP1          :   3;  // Bit  3- 5 | Channel 1 sampling time selection
+        volatile uint32_t SMP2          :   3;  // Bit  6- 8 | Channel 2 sampling time selection
+        volatile uint32_t SMP3          :   3;  // Bit  9-11 | Channel 3 sampling time selection
+        volatile uint32_t SMP4          :   3;  // Bit 12-14 | Channel 4 sampling time selection
+        volatile uint32_t SMP5          :   3;  // Bit 15-17 | Channel 5 sampling time selection
+        volatile uint32_t SMP6          :   3;  // Bit 18-20 | Channel 6 sampling time selection
+        volatile uint32_t SMP7          :   3;  // Bit 21-23 | Channel 7 sampling time selection
+        volatile uint32_t SMP8          :   3;  // Bit 24-26 | Channel 8 sampling time selection
+        volatile uint32_t SMP9          :   3;  // Bit 27-29 | Channel 9 sampling time selection
+        const uint32_t __reserved_1     :   2;  // Bit 30-31 | Reserved, must be kept at reset value.
+    };
+    uint32_t raw;
+} STM32F4xx_ADC_SMPR2_Regdef_t;
+
+typedef union __STM32F4xx_ADC_JOFRx_Regdef
+{
+    struct
+    {
+        volatile uint32_t JOFFSETx      :  12;  // Bit  0-11 | Channel x sampling time selection
+        const uint32_t __reserved_1     :  20;  // Bit 12-31 | Reserved, must be kept at reset value.
+    };
+    uint32_t raw;
+} STM32F4xx_ADC_JOFRx_Regdef_t;
+
+typedef union __STM32F4xx_ADC_HTR_Regdef
+{
+    struct
+    {
+        volatile uint32_t HT            :  12;  // Bit  0-11 | Analog watchdog higher threshold
+        const uint32_t __reserved_1     :  20;  // Bit 12-31 | Reserved, must be kept at reset value.
+    };
+    uint32_t raw;
+} STM32F4xx_ADC_HTR_Regdef_t;
+
+typedef union __STM32F4xx_ADC_LTR_Regdef
+{
+    struct
+    {
+        volatile uint32_t LT            :  12;  // Bit  0-11 | Analog watchdog lower threshold
+        const uint32_t __reserved_1     :  20;  // Bit 12-31 | Reserved, must be kept at reset value.
+    };
+    uint32_t raw;
+} STM32F4xx_ADC_LTR_Regdef_t;
+
+typedef union __STM32F4xx_ADC_SQR1_Regdef
+{
+    struct
+    {
+        volatile uint32_t SQ13          :   5;  // Bit  0- 4 | 13th conversion in regular sequence
+        volatile uint32_t SQ14          :   5;  // Bit  5- 9 | 14th conversion in regular sequence
+        volatile uint32_t SQ15          :   5;  // Bit 10-14 | 15th conversion in regular sequence
+        volatile uint32_t SQ16          :   5;  // Bit 15-19 | 16th conversion in regular sequence
+        volatile uint32_t L             :   4;  // Bit 20-23 | Regular channel sequence length
+        const uint32_t __reserved_1     :   8;  // Bit 24-31 | Reserved, must be kept at reset value.
+    };
+    uint32_t raw;
+} STM32F4xx_ADC_SQR1_Regdef_t;
+
+typedef union __STM32F4xx_ADC_SQR1_Regdef
+{
+    struct
+    {
+        volatile uint32_t SQ7           :   5;  // Bit  0- 4 | 7th conversion in regular sequence
+        volatile uint32_t SQ8           :   5;  // Bit  5- 9 | 8th conversion in regular sequence
+        volatile uint32_t SQ9           :   5;  // Bit 10-14 | 9th conversion in regular sequence
+        volatile uint32_t SQ10          :   5;  // Bit 15-19 | 10th conversion in regular sequence
+        volatile uint32_t SQ11          :   5;  // Bit 20-24 | 11th conversion in regular sequence
+        volatile uint32_t SQ12          :   5;  // Bit 25-29 | 12th conversion in regular sequence
+        const uint32_t __reserved_1     :   2;  // Bit 30-31 | Reserved, must be kept at reset value.
+    };
+    uint32_t raw;
+} STM32F4xx_ADC_SQR2_Regdef_t;
+
+typedef union __STM32F4xx_ADC_SQR3_Regdef
+{
+    struct
+    {
+        volatile uint32_t SQ1           :   5;  // Bit  0- 4 | 1st conversion in regular sequence
+        volatile uint32_t SQ2           :   5;  // Bit  5- 9 | 2nd conversion in regular sequence
+        volatile uint32_t SQ3           :   5;  // Bit 10-14 | 3rd conversion in regular sequence
+        volatile uint32_t SQ4           :   5;  // Bit 15-19 | 4th conversion in regular sequence
+        volatile uint32_t SQ5           :   5;  // Bit 20-24 | 5th conversion in regular sequence
+        volatile uint32_t SQ6           :   5;  // Bit 25-29 | 6th conversion in regular sequence
+        const uint32_t __reserved_1     :   2;  // Bit 30-31 | Reserved, must be kept at reset value.
+    };
+    uint32_t raw;
+} STM32F4xx_ADC_SQR3_Regdef_t;
+
+typedef union __STM32F4xx_ADC_SQR1_Regdef
+{
+    struct
+    {
+        volatile uint32_t JSQ1          :   5;  // Bit  0- 4 | 1st conversion in injected sequence 
+        volatile uint32_t JSQ2          :   5;  // Bit  5- 9 | 2nd conversion in injected sequence 
+        volatile uint32_t JSQ3          :   5;  // Bit 10-14 | 3rd conversion in injected sequence 
+        volatile uint32_t JSQ4          :   5;  // Bit 15-19 | 4th conversion in injected sequence 
+        volatile uint32_t JL            :   4;  // Bit 20-23 | Injected sequence length
+        const uint32_t __reserved_1     :   8;  // Bit 24-31 | Reserved, must be kept at reset value.
+    };
+    uint32_t raw;
+} STM32F4xx_ADC_JQSR_Regdef_t;
+
+typedef union __STM32F4xx_ADC_JDRx_Regdef
+{
+    struct
+    {
+        volatile uint32_t JDATA         :  16;  // Bit  0-11 | Injected data
+        const uint32_t __reserved_1     :  16;  // Bit 12-31 | Reserved, must be kept at reset value.
+    };
+    uint32_t raw;
+} STM32F4xx_ADC_JDRx_Regdef_t;
+
+typedef union __STM32F4xx_ADC_DR_Regdef
+{
+    struct
+    {
+        volatile uint32_t DATA          :  16;  // Bit  0-11 | Regular data
+        const uint32_t __reserved_1     :  16;  // Bit 12-31 | Reserved, must be kept at reset value.
+    };
+    uint32_t raw;
+} STM32F4xx_ADC_DR_Regdef_t;
+
+typedef struct
+{
+    volatile STM32F4xx_ADC_SR_Regdef_t ADC_SR;      // Offset 0x00 | ADC status registe
+    volatile STM32F4xx_ADC_CR1_Regdef_t ADC_CR1;    // Offset 0x04 | ADC control register 1 
+    volatile STM32F4xx_ADC_CR2_Regdef_t ADC_CR2;    // Offset 0x08 | ADC control register 2
+    volatile STM32F4xx_ADC_SMPR1_Regdef_t ADC_SMPR1;// Offset 0x0C | ADC sample time register 1
+    volatile STM32F4xx_ADC_SMPR2_Regdef_t ADC_SMPR2;// Offset 0x10 | ADC sample time register 2 
+    volatile STM32F4xx_ADC_JOFRx_Regdef_t ADC_JOFR1;// Offset 0x14 | ADC injected channel data offset register 1
+    volatile STM32F4xx_ADC_JOFRx_Regdef_t ADC_JOFR2;// Offset 0x18 | ADC injected channel data offset register 2
+    volatile STM32F4xx_ADC_JOFRx_Regdef_t ADC_JOFR3;// Offset 0x1C | ADC injected channel data offset register 3
+    volatile STM32F4xx_ADC_JOFRx_Regdef_t ADC_JOFR4;// Offset 0x20 | ADC injected channel data offset register 4
+    volatile STM32F4xx_ADC_HTR_Regdef_t ADC_HTR;    // Offset 0x24 | ADC watchdog higher threshold register 
+    volatile STM32F4xx_ADC_LTR_Regdef_t ADC_LTR;    // Offset 0x28 | ADC watchdog lower threshold register
+    volatile STM32F4xx_ADC_SQR1_Regdef_t ADC_SQR1;  // Offset 0x2C | ADC regular sequence register 1
+    volatile STM32F4xx_ADC_SQR2_Regdef_t ADC_SQR2;  // Offset 0x30 | ADC regular sequence register 2
+    volatile STM32F4xx_ADC_SQR3_Regdef_t ADC_SQR3;  // Offset 0x34 | ADC regular sequence register 3
+    volatile STM32F4xx_ADC_JQSR_Regdef_t ADC_JSQR;  // Offset 0x38 | ADC injected sequence registe
+    volatile STM32F4xx_ADC_JDRx_Regdef_t ADC_JDR1;  // Offset 0x3C | ADC injected data register 1
+    volatile STM32F4xx_ADC_JDRx_Regdef_t ADC_JDR2;  // Offset 0x40 | ADC injected data register 2
+    volatile STM32F4xx_ADC_JDRx_Regdef_t ADC_JDR3;  // Offset 0x44 | ADC injected data register 3
+    volatile STM32F4xx_ADC_JDRx_Regdef_t ADC_JDR4;  // Offset 0x48 | ADC injected data register 4
+    volatile STM32F4xx_ADC_DR_Regdef_t ADC_DR;      // OFfset 0x4C | ADC regular data register
+} STM32F4xx_ADCx_RegDef_t;
+
+typedef union __STM32F4xx_ADC_CSR_Regdef
+{
+    struct
+    {
+        volatile uint32_t AWD1          :   1;  // Bit     0 | Analog watchdog flag of ADC1
+        volatile uint32_t EOC1          :   1;  // Bit     1 | End of conversion of ADC1
+        volatile uint32_t JEOC1         :   1;  // Bit     2 | Injected channel end of conversion of ADC1
+        volatile uint32_t JSTRT1        :   1;  // Bit     3 | Injected channel Start flag of ADC1
+        volatile uint32_t STRT1         :   1;  // Bit     4 | Regular channel Start flag of ADC1
+        volatile uint32_t OVR1          :   1;  // Bit     5 | Overrun flag of ADC1
+        const uint32_t __reserved_1     :   2;  // Bit  6- 7 | Reserved, must be kept at reset value.
+        volatile uint32_t AWD2          :   1;  // Bit     8 | Analog watchdog flag of ADC2
+        volatile uint32_t EOC2          :   1;  // Bit     9 | End of conversion of ADC2
+        volatile uint32_t JEOC2         :   1;  // Bit    10 | Injected channel end of conversion of ADC2
+        volatile uint32_t JSTRT2        :   1;  // Bit    11 | Injected channel Start flag of ADC2
+        volatile uint32_t STRT2         :   1;  // Bit    12 | Regular channel Start flag of ADC2
+        volatile uint32_t OVR2          :   1;  // Bit    13 | Overrun flag of ADC2
+        const uint32_t __reserved_2     :   2;  // Bit 14-15 | Reserved, must be kept at reset value.
+        volatile uint32_t AWD3          :   1;  // Bit    16 | Analog watchdog flag of ADC3
+        volatile uint32_t EOC3          :   1;  // Bit    17 | End of conversion of ADC3
+        volatile uint32_t JEOC3         :   1;  // Bit    18 | Injected channel end of conversion of ADC3
+        volatile uint32_t JSTRT3        :   1;  // Bit    19 | Injected channel Start flag of ADC3
+        volatile uint32_t STRT3         :   1;  // Bit    22 | Regular channel Start flag of ADC3
+        volatile uint32_t OVR3          :   1;  // Bit    21 | Overrun flag of ADC3
+        const uint32_t __reserved_3     :  10;  // Bit 22-31 | Reserved, must be kept at reset value.
+    };
+    uint32_t raw;
+} STM32F4xx_ADC_CSR_Regdef_t;
+
+typedef union __STM32F4xx_ADC_CCR_Regdef
+{
+    struct
+    {
+        volatile uint32_t MULTI         :   5;  // Bit  0- 4 | Multi ADC mode selection
+        const uint32_t __reserved_1     :   3;  // Bit  5- 7 | Reserved, must be kept at reset value.
+        volatile uint32_t DELAY:        :   4;  // Bit  8-11 | Delay between 2 sampling phases
+        const uint32_t __reserved_2     :   1;  // Bit    12 | Reserved, must be kept at reset value.
+        volatile uint32_t DDS           :   1;  // Bit    13 | DMA disable selection (for multi-ADC mode)
+        volatile uint32_t DMA           :   2;  // Bit 14-15 | Direct memory access mode for multi ADC mode
+        volatile uint32_t ADCPRE        :   2;  // Bit 16-17 | ADC prescaler
+        const uint32_t __reserved_3     :   4;  // Bit 18-21 | Reserved, must be kept at reset value.
+        volatile uint32_t VBATE         :   1;  // Bit    22 | VBAT enable
+        volatile uint32_t TSVREFE       :   1;  // Bit    23 | Temperature sensor and VREFINT enab
+        const uint32_t __reserved_4     :   8;  // Bit 24-31 | Reserved, must be kept at reset value.
+    };
+    uint32_t raw;
+} STM32F4xx_ADC_CCR_Regdef_t;
+
+typedef union __STM32F4xx_ADC_CDR_Regdef
+{
+    struct
+    {
+        volatile uint32_t DATA1         :  16;  // Bit  0-11 | 1st data item of a pair of regular conversions
+        volatile uint32_t DATA2         :  16;  // Bit  0-11 | 2nd data item of a pair of regular conversions
+    };
+    uint32_t raw;
+} STM32F4xx_ADC_CDR_Regdef_t;
+
+typedef struct
+{
+    volatile STM32F4xx_ADC_CSR_Regdef_t ADC_CSR;    // Offset 0x00 | ADC Common status register
+    volatile STM32F4xx_ADC_CCR_Regdef_t ADC_CCR;    // Offset 0x04 | ADC common control register 
+    volatile STM32F4xx_ADC_CDR_Regdef_t ADC_CR2;    // Offset 0x08 | ADC common regular data register for dual and triple modes
+} STM32F4xx_ADCx_common_RegDef_t;
+
+
+#define _MMIO_ADDR_ADC          0x40012000UL
+
+#define _MMIO_ADDR_ADC1         _MMIO_ADDR_ADC + 0x000
+#define STM32F4xx_ADC1          ((STM32F4xx_ADCx_RegDef_t* ) _MMIO_ADDR_ADC1)
+
+#define _MMIO_ADDR_ADC2         _MMIO_ADDR_ADC + 0x100
+#define STM32F4xx_ADC2          ((STM32F4xx_ADCx_RegDef_t* ) _MMIO_ADDR_ADC2)
+
+#define _MMIO_ADDR_ADC3         _MMIO_ADDR_ADC + 0x200
+#define STM32F4xx_ADC2          ((STM32F4xx_ADCx_RegDef_t* ) _MMIO_ADDR_ADC3)
+
+#define _MMIO_ADDR_ADC_COMMON   _MMIO_ADDR_ADC + 0x300
+#define STM32F4xx_ADC_COMMON    ((STM32F4xx_ADCx_common_RegDef_t* ) _MMIO_ADDR_ADC_COMMON)
 
 #define _MMIO_ADDR_DMA1     0x40026000UL
 #define _MMIO_ADDR_DMA2     0x40026400UL
