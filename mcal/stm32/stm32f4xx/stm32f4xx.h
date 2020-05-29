@@ -412,8 +412,9 @@ typedef union __STM32F4xx_RCC_APB2ENR_Regdef
         volatile uint32_t USART1EN      :   1;  // Bit     4
         volatile uint32_t USART6EN      :   1;  // Bit     5
         const uint32_t __reserved_2     :   2;  // Bit  6- 7
-        volatile uint32_t ADCEN         :   1;  // Bit     8
-        const uint32_t __reserved_3     :   2;  // Bit  9-10
+        volatile uint32_t ADCEN1        :   1;  // Bit     8
+        volatile uint32_t ADCEN2        :   1;  // Bit     9
+        volatile uint32_t ADCEN3        :   1;  // Bit    10
         volatile uint32_t SDIOEN        :   1;  // Bit    11
         volatile uint32_t SPI1EN        :   1;  // Bit    12
         const uint32_t __reserved_4     :   1;  // Bit    13
@@ -757,8 +758,12 @@ typedef struct
 #define STM32F4xx_USART6_PCLK_EN()   (STM32F4xx_RCC->RCC_APB2ENR.UART6EN = 1)
 #define STM32F4xx_USART6_PCLK_DI()   (STM32F4xx_RCC->RCC_APB2ENR.UART6EN = 0)
 
-#define STM32F4xx_ADC1_PCLK_EN()     (STM32F4xx_RCC->RCC_APB2ENR.ADCEN = 1)
-#define STM32F4xx_ADC1_PCLK_DI()     (STM32F4xx_RCC->RCC_APB2ENR.ADCEN = 0)
+#define STM32F4xx_ADC1_PCLK_EN()     (STM32F4xx_RCC->RCC_APB2ENR.ADCEN1 = 1)
+#define STM32F4xx_ADC1_PCLK_DI()     (STM32F4xx_RCC->RCC_APB2ENR.ADCEN1 = 0)
+#define STM32F4xx_ADC2_PCLK_EN()     (STM32F4xx_RCC->RCC_APB2ENR.ADCEN2 = 1)
+#define STM32F4xx_ADC2_PCLK_DI()     (STM32F4xx_RCC->RCC_APB2ENR.ADCEN2 = 0)
+#define STM32F4xx_ADC3_PCLK_EN()     (STM32F4xx_RCC->RCC_APB2ENR.ADCEN3 = 1)
+#define STM32F4xx_ADC3_PCLK_DI()     (STM32F4xx_RCC->RCC_APB2ENR.ADCEN3 = 0)
 
 #define STM32F4xx_SDIO_PCLK_EN()     (STM32F4xx_RCC->RCC_APB2ENR.SDIOEN = 1)
 #define STM32F4xx_SDIO_PCLK_DI()     (STM32F4xx_RCC->RCC_APB2ENR.SDIOEN = 0)
@@ -958,7 +963,7 @@ typedef union __STM32F4xx_ADC_SQR1_Regdef
     uint32_t raw;
 } STM32F4xx_ADC_SQR1_Regdef_t;
 
-typedef union __STM32F4xx_ADC_SQR1_Regdef
+typedef union __STM32F4xx_ADC_SQR2_Regdef
 {
     struct
     {
@@ -988,7 +993,7 @@ typedef union __STM32F4xx_ADC_SQR3_Regdef
     uint32_t raw;
 } STM32F4xx_ADC_SQR3_Regdef_t;
 
-typedef union __STM32F4xx_ADC_SQR1_Regdef
+typedef union __STM32F4xx_ADC_JQSR_Regdef
 {
     struct
     {
@@ -1081,7 +1086,7 @@ typedef union __STM32F4xx_ADC_CCR_Regdef
     {
         volatile uint32_t MULTI         :   5;  // Bit  0- 4 | Multi ADC mode selection
         const uint32_t __reserved_1     :   3;  // Bit  5- 7 | Reserved, must be kept at reset value.
-        volatile uint32_t DELAY:        :   4;  // Bit  8-11 | Delay between 2 sampling phases
+        volatile uint32_t DELAY         :   4;  // Bit  8-11 | Delay between 2 sampling phases
         const uint32_t __reserved_2     :   1;  // Bit    12 | Reserved, must be kept at reset value.
         volatile uint32_t DDS           :   1;  // Bit    13 | DMA disable selection (for multi-ADC mode)
         volatile uint32_t DMA           :   2;  // Bit 14-15 | Direct memory access mode for multi ADC mode
@@ -1121,7 +1126,7 @@ typedef struct
 #define STM32F4xx_ADC2          ((STM32F4xx_ADCx_RegDef_t* ) _MMIO_ADDR_ADC2)
 
 #define _MMIO_ADDR_ADC3         _MMIO_ADDR_ADC + 0x200
-#define STM32F4xx_ADC2          ((STM32F4xx_ADCx_RegDef_t* ) _MMIO_ADDR_ADC3)
+#define STM32F4xx_ADC3          ((STM32F4xx_ADCx_RegDef_t* ) _MMIO_ADDR_ADC3)
 
 #define _MMIO_ADDR_ADC_COMMON   _MMIO_ADDR_ADC + 0x300
 #define STM32F4xx_ADC_COMMON    ((STM32F4xx_ADCx_common_RegDef_t* ) _MMIO_ADDR_ADC_COMMON)
