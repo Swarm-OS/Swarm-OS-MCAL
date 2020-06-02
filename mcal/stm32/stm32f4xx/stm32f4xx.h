@@ -1027,54 +1027,47 @@ typedef union __STM32F4xx_TIM_CCER_Regdef
     volatile uint32_t raw;
 } STM32F4xx_TIM_CCER_Regdef_t;
 
-
-typedef struct __STM32F4xx_TIM_CNT_16bit_Regdef
+typedef struct __STM32F4xx_TIM_CNT_Regdef
 {
     struct
     {
-        volatile uint32_t CNT           :  16;  // Bit  0-15 | Counter value     
+        volatile uint32_t CNT;                  // Bit  0-31 | Auto-reload value
+    } timer_32bit;
+    struct
+    {
+        volatile uint32_t CNT           :  16;  // Bit  0-15 | Auto-reload value
         const uint32_t _reserved_1      :  16;  // Bit 16-31 | Reserved, must be kept at reset value.
-    };
+    } timer_16bit;
     volatile uint32_t raw;
-} STM32F4xx_TIM_CNT_16bit_Regdef_t;
+} STM32F4xx_TIM_CNT_Regdef_t;
 
-typedef struct __STM32F4xx_TIM_CNT_32bit_Regdef
+typedef struct __STM32F4xx_TIM_PSC_Regdef
 {
     struct
     {
-        volatile uint32_t CNT;                  // Bit  0-31 | Counter value     
-    };
-    volatile uint32_t raw;
-} STM32F4xx_TIM_CNT_32bit_Regdef_t;
-
-typedef struct __STM32F4xx_TIM_PSC_16bit_Regdef
-{
+        volatile uint32_t PSC;                  // Bit  0-31 | Auto-reload value
+    } timer_32bit;
     struct
     {
-        volatile uint32_t PSC           :  16;  // Bit  0-15 | Prescaler value
+        volatile uint32_t PSC           :  16;  // Bit  0-15 | Auto-reload value
         const uint32_t _reserved_1      :  16;  // Bit 16-31 | Reserved, must be kept at reset value.
-    };
+    } timer_16bit;
     volatile uint32_t raw;
-} STM32F4xx_TIM_PSC_16bit_Regdef_t;
+} STM32F4xx_TIM_PSC_Regdef_t;
 
-typedef struct __STM32F4xx_TIM_ARR_16bit_Regdef
-{
-    struct
-    {
-        volatile uint32_t ARR           :  16;  // Bit  0-15 | Auto-reload value
-        const uint32_t _reserved_1      :  16;  // Bit 16-31 | Reserved, must be kept at reset value.
-    };
-    volatile uint32_t raw;
-} STM32F4xx_TIM_ARR_16bit_Regdef_t;
-
-typedef struct __STM32F4xx_TIM_ARR_32bit_Regdef
+typedef struct __STM32F4xx_TIM_ARR_Regdef
 {
     struct
     {
         volatile uint32_t ARR;                  // Bit  0-31 | Auto-reload value
-    };
+    } timer_32bit;
+    struct
+    {
+        volatile uint32_t ARR           :  16;  // Bit  0-15 | Auto-reload value
+        const uint32_t _reserved_1      :  16;  // Bit 16-31 | Reserved, must be kept at reset value.
+    } timer_16bit;
     volatile uint32_t raw;
-} STM32F4xx_TIM_ARR_32bit_Regdef_t;
+} STM32F4xx_TIM_ARR_Regdef_t;
 
 typedef struct __STM32F4xx_TIM_RCR_Regdef
 {
@@ -1086,24 +1079,19 @@ typedef struct __STM32F4xx_TIM_RCR_Regdef
     volatile uint32_t raw;
 } STM32F4xx_TIM_RCR_Regdef_t;
 
-typedef struct __STM32F4xx_TIM_CCR_16bit_Regdef
-{
-    struct
-    {
-        volatile uint32_t CCR           :  16;  // Bit  0-15 | Auto-reload value
-        const uint32_t _reserved_1      :  16;  // Bit 16-31 | Reserved, must be kept at reset value.
-    };
-    volatile uint32_t raw;
-} STM32F4xx_TIM_CCR_16bit_Regdef_t;
-
-typedef struct __STM32F4xx_TIM_CCR_32bit_Regdef
+typedef struct __STM32F4xx_TIM_CCR_Regdef
 {
     struct
     {
         volatile uint32_t CCR;                  // Bit  0-31 | Auto-reload value
-    };
+    } timer_32bit;
+    struct
+    {
+        volatile uint32_t CCR           :  16;  // Bit  0-15 | Auto-reload value
+        const uint32_t _reserved_1      :  16;  // Bit 16-31 | Reserved, must be kept at reset value.
+    } timer_16bit;
     volatile uint32_t raw;
-} STM32F4xx_TIM_CCR_32bit_Regdef_t;
+} STM32F4xx_TIM_CCR_Regdef_t;
 
 typedef union __STM32F4xx_TIM_BDTR_Regdef
 {
@@ -1151,17 +1139,17 @@ typedef struct
     volatile STM32F4xx_TIM_CCMR1_Regdef_t TIM_CCMR1;    // Offset 0x18 | TIM1 and TIM8 capture/compare mode register 1
     volatile STM32F4xx_TIM_CCMR2_Regdef_t TIM_CCMR2;    // Offset 0x1C | TIM1 and TIM8 capture/compare mode register 2
     volatile STM32F4xx_TIM_CCER_Regdef_t TIM_CCER;      // Offset 0x20 | TIM1 and TIM8 capture/compare enable register
-    volatile STM32F4xx_TIM_CNT_16bit_Regdef_t TIM_CNT;  // Offset 0x24 | TIM1 and TIM8 counter 
-    volatile STM32F4xx_TIM_PSC_16bit_Regdef_t TIM_PSC;  // Offset 0x28 | TIM1 and TIM8 prescaler
-    volatile STM32F4xx_TIM_ARR_16bit_Regdef_t TIM_ARR;  // Offset 0x2C | TIM1 and TIM8 auto-reload register
+    volatile STM32F4xx_TIM_CNT_Regdef_t TIM_CNT;        // Offset 0x24 | TIM1 and TIM8 counter 
+    volatile STM32F4xx_TIM_PSC_Regdef_t TIM_PSC;        // Offset 0x28 | TIM1 and TIM8 prescaler
+    volatile STM32F4xx_TIM_ARR_Regdef_t TIM_ARR;        // Offset 0x2C | TIM1 and TIM8 auto-reload register
     volatile STM32F4xx_TIM_RCR_Regdef_t TIM_RCR;        // Offset 0x30 | TIM1 and TIM8 repetition counter register
-    volatile STM32F4xx_TIM_CCR_16bit_Regdef_t TIM_CCR1; // Offset 0x34 | TIM1 and TIM8 capture/compare register 1
-    volatile STM32F4xx_TIM_CCR_16bit_Regdef_t TIM_CCR2; // Offset 0x38 | TIM1 and TIM8 capture/compare register 2
-    volatile STM32F4xx_TIM_CCR_16bit_Regdef_t TIM_CCR3; // Offset 0x3C | TIM1 and TIM8 capture/compare register 3
-    volatile STM32F4xx_TIM_CCR_16bit_Regdef_t TIM_CCR4; // Offset 0x40 | TIM1 and TIM8 capture/compare register 4
+    volatile STM32F4xx_TIM_CCR_Regdef_t TIM_CCR1;       // Offset 0x34 | TIM1 and TIM8 capture/compare register 1
+    volatile STM32F4xx_TIM_CCR_Regdef_t TIM_CCR2;       // Offset 0x38 | TIM1 and TIM8 capture/compare register 2
+    volatile STM32F4xx_TIM_CCR_Regdef_t TIM_CCR3;       // Offset 0x3C | TIM1 and TIM8 capture/compare register 3
+    volatile STM32F4xx_TIM_CCR_Regdef_t TIM_CCR4;       // Offset 0x40 | TIM1 and TIM8 capture/compare register 4
     volatile STM32F4xx_TIM_BDTR_Regdef_t TIM_BDTR;      // Offset 0x44 | TIM1 and TIM8 break and dead-time register 
     volatile STM32F4xx_TIM_DCR_Regdef_t TIM_DCR;        // Offset 0x48 | TIM1 and TIM8 DMA control register
-    volatile STM32F4xx_TIM_DMAR_Regdef_t TIM_DMARM      // Offset 0x4C | TIM1 and TIM8 DMA address for full transfer 
+    volatile STM32F4xx_TIM_DMAR_Regdef_t TIM_DMARM;     // Offset 0x4C | TIM1 and TIM8 DMA address for full transfer 
 } STM32F4xx_TIM_1_8_RegDef_t;
 
 #define _MMIO_ADDR_TIM1     0x40010000UL
@@ -1194,14 +1182,14 @@ typedef struct
     volatile STM32F4xx_TIM_CCMR1_Regdef_t TIM_CCMR1;    // Offset 0x18 | TIMx capture/compare mode register 1
     volatile STM32F4xx_TIM_CCMR2_Regdef_t TIM_CCMR2;    // Offset 0x1C | TIMx capture/compare mode register 2
     volatile STM32F4xx_TIM_CCER_Regdef_t TIM_CCER;      // Offset 0x20 | TIMx capture/compare enable register
-    volatile STM32F4xx_TIM_CNT_16bit_Regdef_t TIM_CNT;  // Offset 0x24 | TIMx counter 
-    volatile STM32F4xx_TIM_PSC_16bit_Regdef_t TIM_PSC;  // Offset 0x28 | TIMx prescaler 
-    volatile STM32F4xx_TIM_ARR_16bit_Regdef_t TIM_ARR;  // Offset 0x2C | TIMx auto-reload register
+    volatile STM32F4xx_TIM_CNT_Regdef_t TIM_CNT;        // Offset 0x24 | TIMx counter 
+    volatile STM32F4xx_TIM_PSC_Regdef_t TIM_PSC;        // Offset 0x28 | TIMx prescaler 
+    volatile STM32F4xx_TIM_ARR_Regdef_t TIM_ARR;        // Offset 0x2C | TIMx auto-reload register
     const uint32_t __reserved_1;                        // Offset 0x30 | Reserved
-    volatile STM32F4xx_TIM_CCR_16bit_Regdef_t TIM_CCR1; // Offset 0x34 | TIMx capture/compare register 1
-    volatile STM32F4xx_TIM_CCR_16bit_Regdef_t TIM_CCR2; // Offset 0x38 | TIMx capture/compare register 2
-    volatile STM32F4xx_TIM_CCR_16bit_Regdef_t TIM_CCR3; // Offset 0x3C | TIMx capture/compare register 3
-    volatile STM32F4xx_TIM_CCR_16bit_Regdef_t TIM_CCR4; // Offset 0x40 | TIMx capture/compare register 4
+    volatile STM32F4xx_TIM_CCR_Regdef_t TIM_CCR1;       // Offset 0x34 | TIMx capture/compare register 1
+    volatile STM32F4xx_TIM_CCR_Regdef_t TIM_CCR2;       // Offset 0x38 | TIMx capture/compare register 2
+    volatile STM32F4xx_TIM_CCR_Regdef_t TIM_CCR3;       // Offset 0x3C | TIMx capture/compare register 3
+    volatile STM32F4xx_TIM_CCR_Regdef_t TIM_CCR4;       // Offset 0x40 | TIMx capture/compare register 4
     const uint32_t __reserved_2;                        // Offset 0x44 | Reserved
     volatile STM32F4xx_TIM_DCR_Regdef_t TIM_DCR;        // Offset 0x48 | TIMx DMA control register 
     volatile STM32F4xx_TIM_DMAR_Regdef_t TIM_DMARM;     // Offset 0x4C | TIMx DMA address for full transfer
@@ -1219,14 +1207,14 @@ typedef struct
     volatile STM32F4xx_TIM_CCMR1_Regdef_t TIM_CCMR1;    // Offset 0x18 | TIMx capture/compare mode register 1
     volatile STM32F4xx_TIM_CCMR2_Regdef_t TIM_CCMR2;    // Offset 0x1C | TIMx capture/compare mode register 2
     volatile STM32F4xx_TIM_CCER_Regdef_t TIM_CCER;      // Offset 0x20 | TIMx capture/compare enable register
-    volatile STM32F4xx_TIM_CNT_32bit_Regdef_t TIM_CNT;  // Offset 0x24 | TIMx counter 
-    volatile STM32F4xx_TIM_PSC_16bit_Regdef_t TIM_PSC;  // Offset 0x28 | TIMx prescaler 
-    volatile STM32F4xx_TIM_ARR_32bit_Regdef_t TIM_ARR;  // Offset 0x2C | TIMx auto-reload register
+    volatile STM32F4xx_TIM_CNT_Regdef_t TIM_CNT;        // Offset 0x24 | TIMx counter 
+    volatile STM32F4xx_TIM_PSC_Regdef_t TIM_PSC;        // Offset 0x28 | TIMx prescaler 
+    volatile STM32F4xx_TIM_ARR_Regdef_t TIM_ARR;        // Offset 0x2C | TIMx auto-reload register
     const uint32_t __reserved_1;                        // Offset 0x30 | Reserved
-    volatile STM32F4xx_TIM_CCR_32bit_Regdef_t TIM_CCR1; // Offset 0x34 | TIMx capture/compare register 1
-    volatile STM32F4xx_TIM_CCR_32bit_Regdef_t TIM_CCR2; // Offset 0x38 | TIMx capture/compare register 2
-    volatile STM32F4xx_TIM_CCR_32bit_Regdef_t TIM_CCR3; // Offset 0x3C | TIMx capture/compare register 3
-    volatile STM32F4xx_TIM_CCR_32bit_Regdef_t TIM_CCR4; // Offset 0x40 | TIMx capture/compare register 4
+    volatile STM32F4xx_TIM_CCR_Regdef_t TIM_CCR1;       // Offset 0x34 | TIMx capture/compare register 1
+    volatile STM32F4xx_TIM_CCR_Regdef_t TIM_CCR2;       // Offset 0x38 | TIMx capture/compare register 2
+    volatile STM32F4xx_TIM_CCR_Regdef_t TIM_CCR3;       // Offset 0x3C | TIMx capture/compare register 3
+    volatile STM32F4xx_TIM_CCR_Regdef_t TIM_CCR4;       // Offset 0x40 | TIMx capture/compare register 4
     const uint32_t __reserved_2;                        // Offset 0x44 | Reserved
     volatile STM32F4xx_TIM_DCR_Regdef_t TIM_DCR;        // Offset 0x48 | TIMx DMA control register 
     volatile STM32F4xx_TIM_DMAR_Regdef_t TIM_DMARM;     // Offset 0x4C | TIMx DMA address for full transfer
@@ -1252,9 +1240,9 @@ typedef struct
     volatile STM32F4xx_TIM_SR_Regdef_t TIM_SR;          // Offset 0x10 | TIMx status register
     volatile STM32F4xx_TIM_EGR_Regdef_t TIM_EGR;        // Offset 0x14 | TIMx event generation register
     const uint32_t __reserved_2[3];                     // Offset 0x18 | Reserved
-    volatile STM32F4xx_TIM_CNT_16bit_Regdef_t TIM_CNT;  // Offset 0x24 | TIMx counter 
-    volatile STM32F4xx_TIM_PSC_16bit_Regdef_t TIM_PSC;  // Offset 0x28 | TIMx prescaler 
-    volatile STM32F4xx_TIM_ARR_16bit_Regdef_t TIM_ARR;  // Offset 0x2C | TIMx auto-reload register
+    volatile STM32F4xx_TIM_CNT_Regdef_t TIM_CNT;        // Offset 0x24 | TIMx counter 
+    volatile STM32F4xx_TIM_PSC_Regdef_t TIM_PSC;        // Offset 0x28 | TIMx prescaler 
+    volatile STM32F4xx_TIM_ARR_Regdef_t TIM_ARR;        // Offset 0x2C | TIMx auto-reload register
 } STM32F4xx_TIM_6_7_RegDef_t;
 
 #define _MMIO_ADDR_TIM6     0x40001000UL
@@ -1273,27 +1261,49 @@ typedef struct
     volatile STM32F4xx_TIM_CCMR1_Regdef_t TIM_CCMR1;    // Offset 0x18 | TIMx capture/compare mode register 1
     const uint32_t __reserved_3;                        // Offset 0x1C | Reserved
     volatile STM32F4xx_TIM_CCER_Regdef_t TIM_CCER;      // Offset 0x20 | TIMx capture/compare enable register
-    volatile STM32F4xx_TIM_CNT_16bit_Regdef_t TIM_CNT;  // Offset 0x24 | TIMx counter 
-    volatile STM32F4xx_TIM_PSC_16bit_Regdef_t TIM_PSC;  // Offset 0x28 | TIMx prescaler 
-    volatile STM32F4xx_TIM_ARR_16bit_Regdef_t TIM_ARR;  // Offset 0x2C | TIMx auto-reload register
+    volatile STM32F4xx_TIM_CNT_Regdef_t TIM_CNT;        // Offset 0x24 | TIMx counter 
+    volatile STM32F4xx_TIM_PSC_Regdef_t TIM_PSC;        // Offset 0x28 | TIMx prescaler 
+    volatile STM32F4xx_TIM_ARR_Regdef_t TIM_ARR;        // Offset 0x2C | TIMx auto-reload register
     const uint32_t __reserved_4;                        // Offset 0x30 | Reserved
-    volatile STM32F4xx_TIM_CCR_16bit_Regdef_t TIM_CCR1; // Offset 0x34 | TIMx capture/compare register 1
+    volatile STM32F4xx_TIM_CCR_Regdef_t TIM_CCR1;       // Offset 0x34 | TIMx capture/compare register 1
+    volatile STM32F4xx_TIM_CCR_Regdef_t TIM_CCR1;       // Offset 0x38 | TIMx capture/compare register 1
+    const uint32_t __reserved_5[5];                     // Offset 0x3C | Reserved 
+    volatile STM32F4xx_TIM_OR_Regdef_t TIM_OR;          // Offset 0x50 | TIM2 and TIM5 option register
+} STM32F4xx_TIM_9_to_12_RegDef_t;
+
+
+typedef struct
+{
+    volatile STM32F4xx_TIM_CR1_Regdef_t TIM_CR1;        // Offset 0x00 | TIMx control register 1 
+    const uint32_t __reserved_1;                        // Offset 0x04 | Reserved
+    const uint32_t __reserved_2;                        // Offset 0x08 | Reserved
+    volatile STM32F4xx_TIM_DIER_Regdef_t TIM_DIER;      // Offset 0x0C | TIMx DMA/Interrupt enable register
+    volatile STM32F4xx_TIM_SR_Regdef_t TIM_SR;          // Offset 0x10 | TIMx status register
+    volatile STM32F4xx_TIM_EGR_Regdef_t TIM_EGR;        // Offset 0x14 | TIMx event generation register
+    volatile STM32F4xx_TIM_CCMR1_Regdef_t TIM_CCMR1;    // Offset 0x18 | TIMx capture/compare mode register 1
+    const uint32_t __reserved_3;                        // Offset 0x1C | Reserved
+    volatile STM32F4xx_TIM_CCER_Regdef_t TIM_CCER;      // Offset 0x20 | TIMx capture/compare enable register
+    volatile STM32F4xx_TIM_CNT_Regdef_t TIM_CNT;        // Offset 0x24 | TIMx counter 
+    volatile STM32F4xx_TIM_PSC_Regdef_t TIM_PSC;        // Offset 0x28 | TIMx prescaler 
+    volatile STM32F4xx_TIM_ARR_Regdef_t TIM_ARR;        // Offset 0x2C | TIMx auto-reload register
+    const uint32_t __reserved_4;                        // Offset 0x30 | Reserved
+    volatile STM32F4xx_TIM_CCR_Regdef_t TIM_CCR1;       // Offset 0x34 | TIMx capture/compare register 1
     const uint32_t __reserved_5[6];                     // Offset 0x38 | Reserved 
     volatile STM32F4xx_TIM_OR_Regdef_t TIM_OR;          // Offset 0x50 | TIM2 and TIM5 option register
-} STM32F4xx_TIM_9_to_14_RegDef_t;
+} STM32F4xx_TIM_10_11_13_14_RegDef_t;
 
 #define _MMIO_ADDR_TIM9     0x40014000UL
-#define STM32F4XX_TIM9_REG   ((STM32F4xx_TIM_9_to_14_RegDef_t* ) _MMIO_ADDR_TIM9)
+#define STM32F4XX_TIM9_REG   ((STM32F4xx_TIM_9_to_12_RegDef_t* ) _MMIO_ADDR_TIM9)
 #define _MMIO_ADDR_TIM10    0x40014400UL  
-#define STM32F4XX_TIM10_REG   ((STM32F4xx_TIM_9_to_14_RegDef_t* ) _MMIO_ADDR_TIM10)
+#define STM32F4XX_TIM10_REG   ((STM32F4xx_TIM_10_11_13_14_RegDef_t* ) _MMIO_ADDR_TIM10)
 #define _MMIO_ADDR_TIM11    0x40014800UL
-#define STM32F4XX_TIM11_REG   ((STM32F4xx_TIM_9_to_14_RegDef_t* ) _MMIO_ADDR_TIM11)
+#define STM32F4XX_TIM11_REG   ((STM32F4xx_TIM_10_11_13_14_RegDef_t* ) _MMIO_ADDR_TIM11)
 #define _MMIO_ADDR_TIM12    0x40001800UL
-#define STM32F4XX_TIM12_REG   ((STM32F4xx_TIM_9_to_14_RegDef_t* ) _MMIO_ADDR_TIM12)
+#define STM32F4XX_TIM12_REG   ((STM32F4xx_TIM_9_to_12_RegDef_t* ) _MMIO_ADDR_TIM12)
 #define _MMIO_ADDR_TIM13    0x40001C00UL
-#define STM32F4XX_TIM13_REG   ((STM32F4xx_TIM_9_to_14_RegDef_t* ) _MMIO_ADDR_TIM13)
+#define STM32F4XX_TIM13_REG   ((STM32F4xx_TIM_10_11_13_14_RegDef_t* ) _MMIO_ADDR_TIM13)
 #define _MMIO_ADDR_TIM14    0x40002000UL
-#define STM32F4XX_TIM14_REG   ((STM32F4xx_TIM_9_to_14_RegDef_t* ) _MMIO_ADDR_TIM14)
+#define STM32F4XX_TIM14_REG   ((STM32F4xx_TIM_10_11_13_14_RegDef_t* ) _MMIO_ADDR_TIM14)
 
 #define _MMIO_ADDR_RTC      0x40002800UL 
 

@@ -13,12 +13,8 @@
 #include <datatypes.h>
 #include <stddef.h>
 #include "stm32f4xx.h"
+#include "stm32f4xx_TimerIf.h"
 
-#if IS_MCU(STM32F411)
-#   define MAX_TIMER 11
-#else if IS_MCU(STM32F407)
-#   define MAX_TIMER 14
-#endif
 
 typedef struct timer_config
 {
@@ -31,13 +27,13 @@ typedef struct timer_config
     };
 } timer_config_t;
 
-static volatile timer_config_t global_cfg[MAX_TIMER][4];
+static volatile timer_config_t global_cfg[MAX_TIMER_ID][4];
 
 static boolean timer_exists(identifier_t timer_id);
 
 static std_return_type_t config_16bit_timer(TimerIf_config_t *cfg);
 static std_return_type_t config_32bit_timer(TimerIf_config_t *cfg);
-static std_return_type_t config_cnt_mode( identifier_t timer_id, STM32F4xx_TIM_CR1_Regdef_t *cr1_reg, TimerIf_counting_mode_t cnt_mode);
+static std_return_type_t config_cnt_mode( identifier_t timer_id, TimerIf_counting_mode_t cnt_mode);
 
 static std_return_type_t config_advanced_timer(TimerIf_channel_config_t *cfg);
 static std_return_type_t config_general_purpose_timer(TimerIf_channel_config_t *cfg);
@@ -326,6 +322,12 @@ std_return_type_t TimerIf_config(TimerIf_config_t *cfg)
         {
             status = config_16bit_timer(cfg);
         }
+
+        if(status == E_OK)
+        {
+            // set counting mode
+            status = config_cnt_mode(cfg->timer_id, cfg->cnt_mode);
+        }
     }
     else
     {
@@ -336,89 +338,9 @@ std_return_type_t TimerIf_config(TimerIf_config_t *cfg)
 
 static std_return_type_t config_16bit_timer(TimerIf_config_t *cfg)
 {
-    STM32F4xx_TIM_CR1_Regdef_t *cr1_reg;
-    STM32F4xx_TIM_ARR_16bit_Regdef_t *arr_reg;
-    STM32F4xx_TIM_PSC_16bit_Regdef_t *psc_reg;
+    STM32F4xx_TIM_ARR_Regdef_t *arr_reg = arr_regs[cfg->timer_id];
+    STM32F4xx_TIM_PSC_Regdef_t *psc_reg = psc_regs[cfg->timer_id];
     std_return_type_t status = E_OK;
-
-    switch (cfg->timer_id)
-    {
-    case 1:
-        cr1_reg = &STM32F4XX_TIM1_REG->TIM_CR1;
-        arr_reg = &STM32F4XX_TIM1_REG->TIM_ARR;
-        psc_reg = &STM32F4XX_TIM1_REG->TIM_PSC;
-        break;
-    case 3:
-        cr1_reg = &STM32F4XX_TIM3_REG->TIM_CR1;
-        arr_reg = &STM32F4XX_TIM3_REG->TIM_ARR;
-        psc_reg = &STM32F4XX_TIM3_REG->TIM_PSC;
-        break;
-    case 4:
-        cr1_reg = &STM32F4XX_TIM4_REG->TIM_CR1;
-        arr_reg = &STM32F4XX_TIM4_REG->TIM_ARR;
-        psc_reg = &STM32F4XX_TIM4_REG->TIM_PSC;
-        break;
-#if IS_MCU(MCU_STM32F407)
-    case 6:
-        cr1_reg = &STM32F4XX_TIM6_REG->TIM_CR1;
-        arr_reg = &STM32F4XX_TIM6_REG->TIM_ARR;
-        psc_reg = &STM32F4XX_TIM6_REG->TIM_PSC;
-        break;
-#endif
-#if IS_MCU(MCU_STM32F407)
-    case 7:
-        cr1_reg = &STM32F4XX_TIM7_REG->TIM_CR1;
-        arr_reg = &STM32F4XX_TIM7_REG->TIM_ARR;
-        psc_reg = &STM32F4XX_TIM7_REG->TIM_PSC;
-        break;
-#endif
-#if IS_MCU(MCU_STM32F407)
-    case 8:
-        cr1_reg = &STM32F4XX_TIM8_REG->TIM_CR1;
-        arr_reg = &STM32F4XX_TIM8_REG->TIM_ARR;
-        psc_reg = &STM32F4XX_TIM8_REG->TIM_PSC;
-        break;
-#endif
-    case 9:
-        cr1_reg = &STM32F4XX_TIM9_REG->TIM_CR1;
-        arr_reg = &STM32F4XX_TIM9_REG->TIM_ARR;
-        psc_reg = &STM32F4XX_TIM9_REG->TIM_PSC;
-        break;
-    case 10:
-        cr1_reg = &STM32F4XX_TIM10_REG->TIM_CR1;
-        arr_reg = &STM32F4XX_TIM10_REG->TIM_ARR;
-        psc_reg = &STM32F4XX_TIM10_REG->TIM_PSC;
-        break;
-    case 11:
-        cr1_reg = &STM32F4XX_TIM11_REG->TIM_CR1;
-        arr_reg = &STM32F4XX_TIM11_REG->TIM_ARR;
-        psc_reg = &STM32F4XX_TIM11_REG->TIM_PSC;
-        break;
-#if IS_MCU(MCU_STM32F407)
-    case 12:
-        cr1_reg = &STM32F4XX_TIM12_REG->TIM_CR1;
-        arr_reg = &STM32F4XX_TIM12_REG->TIM_ARR;
-        psc_reg = &STM32F4XX_TIM12_REG->TIM_PSC;
-        break;
-#endif
-#if IS_MCU(MCU_STM32F407)
-    case 13:
-        cr1_reg = &STM32F4XX_TIM13_REG->TIM_CR1;
-        arr_reg = &STM32F4XX_TIM13_REG->TIM_ARR;
-        psc_reg = &STM32F4XX_TIM13_REG->TIM_PSC;
-        break;
-#endif
-#if IS_MCU(MCU_STM32F407)
-    case 14:
-        cr1_reg = &STM32F4XX_TIM14_REG->TIM_CR1;
-        arr_reg = &STM32F4XX_TIM14_REG->TIM_ARR;
-        psc_reg = &STM32F4XX_TIM14_REG->TIM_PSC;
-        break;    
-#endif
-    default:
-        status = E_NOT_EXISTING;
-        break;
-    }
 
     if(cfg->period > 0xFFFF || cfg->prescaler > 0xFFFF)
     {
@@ -426,11 +348,9 @@ static std_return_type_t config_16bit_timer(TimerIf_config_t *cfg)
     }
     else
     {
-        arr_reg->ARR = cfg->period;
-        psc_reg->PSC = cfg->prescaler;
+        arr_reg->timer_16bit.ARR= cfg->period;
+        psc_reg->timer_16bit.PSC = cfg->prescaler;
     }
-
-    status = config_cnt_mode(cfg->timer_id, cr1_reg, cfg->cnt_mode);
 
     if(cfg->clk_source != TIMERIF_INTERNAL_CLK)
     {
@@ -454,11 +374,8 @@ static std_return_type_t config_32bit_timer(TimerIf_config_t *cfg)
         timer_reg = STM32F4XX_TIM5_REG;
     }
 
-    timer_reg->TIM_ARR.ARR = cfg->period;
-    timer_reg->TIM_PSC.PSC = cfg->prescaler;
-
-    // set counting mode
-    status = config_cnt_mode(cfg->timer_id, &timer_reg->TIM_CR1, cfg->cnt_mode);
+    timer_reg->TIM_ARR.timer_32bit.ARR = cfg->period;
+    timer_reg->TIM_PSC.timer_32bit.PSC = cfg->prescaler;
 
     if(cfg->clk_source != TIMERIF_INTERNAL_CLK)
     {
@@ -468,9 +385,10 @@ static std_return_type_t config_32bit_timer(TimerIf_config_t *cfg)
     return status;
 }
 
-static std_return_type_t config_cnt_mode( identifier_t timer_id, STM32F4xx_TIM_CR1_Regdef_t *cr1_reg, TimerIf_counting_mode_t cnt_mode)
+static std_return_type_t config_cnt_mode( identifier_t timer_id, TimerIf_counting_mode_t cnt_mode)
 {
     std_return_type_t status = E_OK;
+    STM32F4xx_TIM_CR1_Regdef_t *cr1_reg = cr1_regs[timer_id];
     
     if(timer_id == 6 || timer_id == 7 || timer_id >8)
     {
@@ -601,10 +519,12 @@ static std_return_type_t config_advanced_timer(TimerIf_channel_config_t *cfg)
     case TIMERIF_MODE_OUTPUT_PWM:
         status = config_pwm_output(cfg);
         break;
+    case TIMERIF_MODE_OUTPUT_COMPARE:
+        status = config_output_compare(cfg);
+        break;
 
     case TIMERIF_MODE_DISABLED:
     case TIMERIF_MODE_NORMAL:
-    case TIMERIF_MODE_OUTPUT_COMPARE:
     case TIMERIF_MODE_INPUT_COMPTURE:
     case TIMERIF_MODE_INPUT_PWM_COMPTURE:
     case TIMERIF_MODE_OUTPUT_SINGLE_SHOT:
@@ -631,7 +551,7 @@ static std_return_type_t config_general_purpose_timer(TimerIf_channel_config_t *
     switch (cfg->mode)
     {
     case TIMERIF_MODE_OUTPUT_COMPARE:
-
+        status = config_output_compare(cfg);
         break;
     case TIMERIF_MODE_OUTPUT_PWM:
         status = config_pwm_output(cfg);
@@ -671,57 +591,7 @@ static std_return_type_t config_basic_timer(TimerIf_channel_config_t *cfg)
 
 static std_return_type_t config_outputs(TimerIf_channel_config_t *cfg)
 {
-    STM32F4xx_TIM_CCER_Regdef_t *ccer_reg;
-
-    switch (cfg->timer_id)
-    {
-    case 1:
-        ccer_reg = &STM32F4XX_TIM1_REG->TIM_CCER;
-        break;
-    case 2:
-        ccer_reg = &STM32F4XX_TIM2_REG->TIM_CCER;
-        break;
-    case 3:
-        ccer_reg = &STM32F4XX_TIM3_REG->TIM_CCER;
-        break;
-    case 4:
-        ccer_reg = &STM32F4XX_TIM4_REG->TIM_CCER;
-        break;
-    case 5:
-        ccer_reg = &STM32F4XX_TIM5_REG->TIM_CCER;
-        break;
-#if IS_MCU(MCU_STM32F407)
-    case 8:
-        ccer_reg = &STM32F4XX_TIM8_REG->TIM_CCER;
-        break;
-#endif
-    case 9:
-        ccer_reg = &STM32F4XX_TIM9_REG->TIM_CCER;
-        break;
-    case 10:
-        ccer_reg = &STM32F4XX_TIM10_REG->TIM_CCER;
-        break;
-    case 11:
-        ccer_reg = &STM32F4XX_TIM11_REG->TIM_CCER;
-        break;
-#if IS_MCU(MCU_STM32F407)
-    case 12:
-        ccer_reg = &STM32F4XX_TIM12_REG->TIM_CCER;
-        break;
-#endif
-#if IS_MCU(MCU_STM32F407)
-    case 13:
-        ccer_reg = &STM32F4XX_TIM13_REG->TIM_CCER;
-        break;
-#endif
-#if IS_MCU(MCU_STM32F407)
-    case 14:
-        ccer_reg = &STM32F4XX_TIM14_REG->TIM_CCER;
-        break;
-#endif
-    default:
-        return E_NOT_EXISTING;
-    }
+    STM32F4xx_TIM_CCER_Regdef_t *ccer_reg = ccer_regs[cfg->timer_id];
 
     uint8_t flags = 0;
 
@@ -757,74 +627,11 @@ static std_return_type_t config_outputs(TimerIf_channel_config_t *cfg)
 
 static std_return_type_t config_pwm_output(TimerIf_channel_config_t *cfg)
 {
-    STM32F4xx_TIM_CCMR1_Regdef_t *ccmr1_reg;
-    STM32F4xx_TIM_CCMR2_Regdef_t *ccmr2_reg;
+    STM32F4xx_TIM_CCMR1_Regdef_t *ccmr1_reg = ccmr1_regs[cfg->timer_id];
+    STM32F4xx_TIM_CCMR2_Regdef_t *ccmr2_reg = ccmr2_regs[cfg->timer_id];
 
-    switch (cfg->timer_id)
+    if(ccmr1_reg == NULL || ccmr2_reg == NULL)
     {
-    case 1:
-        ccmr1_reg = &STM32F4XX_TIM1_REG->TIM_CCMR1;
-        ccmr2_reg = &STM32F4XX_TIM1_REG->TIM_CCMR2;
-        STM32F4XX_TIM1_REG->TIM_CR1.ARPE = 1;
-        break;
-    case 2:
-        ccmr1_reg = &STM32F4XX_TIM2_REG->TIM_CCMR1;
-        ccmr2_reg = &STM32F4XX_TIM2_REG->TIM_CCMR2;
-        STM32F4XX_TIM2_REG->TIM_CR1.ARPE = 1;
-        break;
-    case 3:
-        ccmr1_reg = &STM32F4XX_TIM3_REG->TIM_CCMR1;
-        ccmr2_reg = &STM32F4XX_TIM3_REG->TIM_CCMR2;
-        STM32F4XX_TIM3_REG->TIM_CR1.ARPE = 1;
-        break;
-    case 4:
-        ccmr1_reg = &STM32F4XX_TIM4_REG->TIM_CCMR1;
-        ccmr2_reg = &STM32F4XX_TIM4_REG->TIM_CCMR2;
-        STM32F4XX_TIM4_REG->TIM_CR1.ARPE = 1;
-        break;
-    case 5:
-        ccmr1_reg = &STM32F4XX_TIM5_REG->TIM_CCMR1;
-        ccmr2_reg = &STM32F4XX_TIM5_REG->TIM_CCMR2;
-        STM32F4XX_TIM5_REG->TIM_CR1.ARPE = 1;
-        break;
-#if IS_MCU(MCU_STM32F407)
-    case 8:
-        ccmr1_reg = &STM32F4XX_TIM8_REG->TIM_CCMR1;
-        ccmr2_reg = &STM32F4XX_TIM8_REG->TIM_CCMR2;
-        STM32F4XX_TIM8_REG->TIM_CR1.ARPE = 1;
-        break;
-#endif
-    case 9:
-        ccmr1_reg = &STM32F4XX_TIM9_REG->TIM_CCMR1;
-        STM32F4XX_TIM9_REG->TIM_CR1.ARPE = 1;
-        break;
-    case 10:
-        ccmr1_reg = &STM32F4XX_TIM10_REG->TIM_CCMR1;
-        STM32F4XX_TIM10_REG->TIM_CR1.ARPE = 1;
-        break;
-    case 11:
-        ccmr1_reg = &STM32F4XX_TIM11_REG->TIM_CCMR1;
-        STM32F4XX_TIM11_REG->TIM_CR1.ARPE = 1;
-        break;
-#if IS_MCU(MCU_STM32F407)
-    case 12:
-        ccmr1_reg = &STM32F4XX_TIM12_REG->TIM_CCMR1;
-        STM32F4XX_TIM12_REG->TIM_CR1.ARPE = 1;
-        break;
-#endif
-#if IS_MCU(MCU_STM32F407)
-    case 13:
-        ccmr1_reg = &STM32F4XX_TIM13_REG->TIM_CCMR1;
-        STM32F4XX_TIM13_REG->TIM_CR1.ARPE = 1;
-        break;
-#endif
-#if IS_MCU(MCU_STM32F407)
-    case 14:
-        ccmr1_reg = &STM32F4XX_TIM14_REG->TIM_CCMR1;
-        STM32F4XX_TIM14_REG->TIM_CR1.ARPE = 1;
-        break;
-#endif
-    default:
         return E_NOT_EXISTING;
     }
 
@@ -875,62 +682,11 @@ static std_return_type_t config_pwm_output(TimerIf_channel_config_t *cfg)
 
 static std_return_type_t config_output_compare(TimerIf_channel_config_t *cfg)
 {
-    STM32F4xx_TIM_CCMR1_Regdef_t *ccmr1_reg;
-    STM32F4xx_TIM_CCMR2_Regdef_t *ccmr2_reg;
+    STM32F4xx_TIM_CCMR1_Regdef_t *ccmr1_reg = ccmr1_regs[cfg->timer_id];
+    STM32F4xx_TIM_CCMR2_Regdef_t *ccmr2_reg = ccmr2_regs[cfg->timer_id];
 
-    switch (cfg->timer_id)
+    if(ccmr1_reg == NULL || ccmr2_reg == NULL)
     {
-    case 1:
-        ccmr1_reg = &STM32F4XX_TIM1_REG->TIM_CCMR1;
-        ccmr2_reg = &STM32F4XX_TIM1_REG->TIM_CCMR2;
-        break;
-    case 2:
-        ccmr1_reg = &STM32F4XX_TIM2_REG->TIM_CCMR1;
-        ccmr2_reg = &STM32F4XX_TIM2_REG->TIM_CCMR2;
-        break;
-    case 3:
-        ccmr1_reg = &STM32F4XX_TIM3_REG->TIM_CCMR1;
-        ccmr2_reg = &STM32F4XX_TIM3_REG->TIM_CCMR2;
-        break;
-    case 4:
-        ccmr1_reg = &STM32F4XX_TIM4_REG->TIM_CCMR1;
-        ccmr2_reg = &STM32F4XX_TIM4_REG->TIM_CCMR2;
-        break;
-    case 5:
-        ccmr1_reg = &STM32F4XX_TIM5_REG->TIM_CCMR1;
-        ccmr2_reg = &STM32F4XX_TIM5_REG->TIM_CCMR2;
-        break;
-#if IS_MCU(MCU_STM32F407)
-    case 8:
-        ccmr1_reg = &STM32F4XX_TIM8_REG->TIM_CCMR1;
-        ccmr2_reg = &STM32F4XX_TIM8_REG->TIM_CCMR2;
-        break;
-#endif
-    case 9:
-        ccmr1_reg = &STM32F4XX_TIM9_REG->TIM_CCMR1;
-        break;
-    case 10:
-        ccmr1_reg = &STM32F4XX_TIM10_REG->TIM_CCMR1;
-        break;
-    case 11:
-        ccmr1_reg = &STM32F4XX_TIM11_REG->TIM_CCMR1;
-        break;
-#if IS_MCU(MCU_STM32F407)
-    case 12:
-        ccmr1_reg = &STM32F4XX_TIM12_REG->TIM_CCMR1;
-        break;
-#endif
-#if IS_MCU(MCU_STM32F407)
-    case 13:
-        ccmr1_reg = &STM32F4XX_TIM13_REG->TIM_CCMR1;
-        break;
-#endif
-#if IS_MCU(MCU_STM32F407)
-    case 14:
-        ccmr1_reg = &STM32F4XX_TIM14_REG->TIM_CCMR1;
-        break;
-#endif
-    default:
         return E_NOT_EXISTING;
     }
 
@@ -980,7 +736,6 @@ static std_return_type_t config_output_compare(TimerIf_channel_config_t *cfg)
         ccmr2_reg->oc.OC4FE = 0;
     }
     
-
     return E_OK;
 }
 
