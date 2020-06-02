@@ -25,14 +25,6 @@ typedef enum _TimerIf_timer_mode
     TIMERIF_MODE_OUTPUT_SINGLE_SHOT     = 0x22, //  Timer/Channel generates a single impulse after a given time
 } TimerIf_timer_mode_t;
 
-typedef enum _TimerIf_CC_mode
-{
-    TIMERIF_NORMAL                      = 0x00, 
-    TIMERIF_CAPTURE_COMPARE             = 0x01, // Compares timer value with a given "compare" value
-    TIMERIF_INPUT_CAPTURE               = 0x02, // Captures external events
-    TIMERIF_SINGLE_SHOT                 = 0x03, // Single shot timer
-} TimerIf_CC_mode_t;
-
 typedef enum _TimerIf_PWM_mode
 {
     TIMERIF_PWM                         = 0x10, // general PWM mode 
@@ -41,11 +33,20 @@ typedef enum _TimerIf_PWM_mode
     TIMERIF_PHASE_FREQUENCy_PWM         = 0x13, // Phase and frequency correct PWM mode
 } TimerIf_PWM_mode_t;
 
+typedef enum __TimerIf_outputs
+{
+    TIMERIF_OUTPUT_NO                      = 0x00, // no PWM output 
+    TIMERIF_OUTPUT_NORMAL                  = 0x01, // only use normal output
+    TIMERIF_OUTPUT_COMPLEMTARY             = 0x02, // only use complementary output
+    TIMERIF_OUTPUT_BOTH                    = 0x03, // use normal and complementary output
+} TimerIf_outputs_t;
+
+
 typedef enum _TimerIf_PWM_polarity
 {
-    TIMERIF_POLARITY_ACTIVE_LOW         = 0x00, // Cycle starts active and switches to passive
-    TIMERIF_POLARITY_ACTIVE_HIGH        = 0x01, // Cycle starts passive and switches to active
-} TimerIf_PWM_polarity_t;
+    TIMERIF_POLARITY_ACTIVE_HIGH        = 0x00, // Cycle starts active and switches to passive
+    TIMERIF_POLARITY_ACTIVE_LOW         = 0x01, // Cycle starts passive and switches to active
+} TimerIf_PWM_polarity_t; 
 
 typedef enum _TimerIf_clk_source
 {
@@ -67,47 +68,66 @@ typedef enum _TimerIf_conting_mode
 
 typedef struct 
 {
-    uint8_t num_channels;               //  Number of available channels
-    uint8_t resolution;                 //  Timer Resolution in Bit
-} TimerIf_info_t;
-
-typedef struct 
-{
-    uint32_t period;                    //  Reset value of the timer
-    uint32_t prescaler;                 //  Timer prescaler
-    uint8_t ch_prescaler;               //  Channel prescaler
-    uint8_t timer_id;                   //  Timer to be configured
-    uint8_t channel_id;                 //  Timer channel to be configured
-    TimerIf_counting_mode_t cnt_mode;   //  counting mode
-} TimerIf_timer_t;
-
-typedef struct 
-{
-    void (*callback)(void);             //  Callback when output compare was triggered
-    TimerIf_timer_t handle;             //  General Timer Configuration 
-    boolean is_single_shot;             //  Duty cycle of the PWM
+    void (*callback)(void);                 //  Callback when output compare was triggered
 } TimerIf_CTC_handle_t;
 
 typedef struct 
 {
-    TimerIf_timer_t handle;             //  General Timer Configuration 
-    uint32_t duty_cycle;                //  Duty cycle of the PWM
-    TimerIf_PWM_polarity_t polarity;    //  PWM polarity
+    TimerIf_PWM_polarity_t polarity_pwm;    //  PWM polarity 
+    TimerIf_PWM_mode_t pwm_mode;            //  PWM Mode
 } TimerIf_PWM_handle_t;
+
+typedef enum _TimerIf_edge_selection
+{
+    TIMERIF_EDGE_NONE                   = 0x00, // No edge selected
+    TIMERIF_RISING_EDGE                 = 0x01, // Generate/Trigger on rising edge
+    TIMERIF_FALLING_EDGE                = 0x02, // Generate/Trigger on faling edge
+    TIMERIF_BOTH_EDGES                  = 0x03, // Generate alternating edges /Trigger on both edges
+} TimerIf_edge_selection_t;
 
 typedef struct 
 {
+    uint32_t prescaler;                 //  Input capture prescaler
+    TimerIf_edge_selection_t edge;      //  Selection of which edge the input capture shall be triggered
+    uint8_t samples;                    //  Number of samples for input capture
     void (*callback)(uint32_t);         //  Callback with timer value when input capture is triggered
-    TimerIf_timer_t handle;             //  General Timer Configuration
-
 } TimerIf_IC_handle_t;
 
 typedef struct 
 {
-    void (*callback)(void);     //  Callback when output compare was triggered
-    TimerIf_timer_t handle;     //  General Timer Configuration
+    TimerIf_edge_selection_t edge;      //  Selection of which edge which shall be generated, set to TIMERIF_EDGE_NONE to disable output compare 
+    void (*callback)(void);             //  Callback when output compare was triggered, set to NULL if only a waveform shall be generated
 } TimerIf_OC_handle_t;
 
+typedef struct 
+{
+    uint32_t period;                        //  Reset value of the timer, set to 0 to use complete value range of timer
+    uint32_t prescaler;                     //  Timer prescaler
+    uint8_t timer_id;                       //  Timer to be configured
+    TimerIf_counting_mode_t cnt_mode;       //  counting mode
+    TimerIf_clk_source_t clk_source;        //  Clock source for the Timer peripherla
+} TimerIf_config_t;
+
+typedef struct __TimerIf_channel_config
+{
+    TimerIf_timer_mode_t mode;              //  Mode in which the channel shall operater
+    struct
+    {
+        boolean invert_polarity_channel;        //  polarity of normal output
+        boolean invert_polarity_compchannel;    //  polarity of complementary output
+        TimerIf_outputs_t output;               //  Waveform generation output configuration
+    } output;
+    
+    union 
+    {
+        TimerIf_CTC_handle_t ctc;           //  
+        TimerIf_PWM_handle_t pwm;           //
+        TimerIf_IC_handle_t input_capture;  //
+        TimerIf_OC_handle_t output_compare; //
+    };
+    uint8_t timer_id;                       //  Timer to be configured
+    uint8_t channel_id;                     //  Timer channel to be configured
+} TimerIf_channel_config_t;
 
 
 
@@ -159,22 +179,6 @@ std_return_type_t TimerIf_Timer_start(uint8_t timer_id);
  */
 std_return_type_t TimerIf_Timer_stop(uint8_t timer_id);
 
-
-/**
- * @brief Get information of Hardware Timer
- *  
- * This function returns the information of a given timer.
- * 
- * @param  uint8_t timer_id         : Timer Number 
- * @param  TimerIf_info_t *info     : Buffer for returning the timer information
- * @return std_return_type_t status : If the given timer does not exist on the 
- *                                    microcontroller, the function return 
- *                                    E_NOT_EXISTING. If given pointer is NULL
- *                                    the function returns E_VALUE_NULL. Else it 
- *                                    returns E_OK.
- */
-std_return_type_t TimerIf_get_information(uint8_t timer_id, TimerIf_info_t *info);
-
 /**
  * @brief Configuration of a Timer
  *  
@@ -191,9 +195,7 @@ std_return_type_t TimerIf_get_information(uint8_t timer_id, TimerIf_info_t *info
  *                                    not available the function returns 
  *                                    E_NOT_SUPPORTED. Else it returns E_OK.
  */
-std_return_type_t TimerIf_config(uint8_t timer_id, uint16_t prescaler, TimerIf_clk_source_t clk_src);
-
-std_return_type_t TimerIf_CTC_config(uint8_t timer_id, uint16_t prescaler);
+std_return_type_t TimerIf_config(TimerIf_config_t *cfg);
 
 /**
  * @brief Configuration of a channel as PWM
@@ -211,13 +213,14 @@ std_return_type_t TimerIf_CTC_config(uint8_t timer_id, uint16_t prescaler);
  *                                    not available the function returns 
  *                                    E_NOT_SUPPORTED. Else it returns E_OK.
  */
-std_return_type_t TimerIf_PWM_config(uint8_t timer_id, uint16_t period, TimerIf_PWM_mode_t mode);
+std_return_type_t TimerIf_channel_config(TimerIf_channel_config_t *cfg);
 
-std_return_type_t TimerIf_set_PWM_duty_cylce(uint8_t timer_id, uint8_t channel_id, uint32_t duty_cycle);
+std_return_type_t TimerIf_set_duty_cycle(identifier_t timer_id, identifier_t channel, uint32_t duty_cycle);
 
-std_return_type_t TimerIf_IC_config(uint8_t timer_id, uint8_t channel_id, void (*callback)(uint32_t));
+std_return_type_t TimerIf_set_output_compare_offset(identifier_t timer_id, identifier_t channel, uint32_t duty_cycle);
 
-std_return_type_t TimerIf_config_OC(uint8_t timer_id, uint8_t channel_id, uint32_t period, void (*callback)(void));
+std_return_type_t TimerIf_reset_counter(identifier_t timer_id);
 
+std_return_type_t TimerIf_get_counter(identifier_t timer_id, uint32_t *buffer);
 
 #endif
